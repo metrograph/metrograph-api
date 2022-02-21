@@ -6,10 +6,10 @@ import os
 import uuid
 import aiofiles
 
-app = Sanic("metrograph-api")
+app = Sanic("metrograph-api", env_prefix='METRO_')
 
-app.config.uploads_path = "/home/hamza/Projects/Jupyter/metrograpgh/uploads/"
-app.config.flat_tasks_path = "/home/hamza/Projects/Jupyter/metrograpgh/flat_tasks/"
+app.config.uploads_path = "/home/metrograph/uploads"
+app.config.flat_tasks_path = "/home/metrograph/flat_tasks/"
 app.config.guest_flat_task_path = '/usr/src/app'
 
 @app.post("/task")
@@ -38,3 +38,5 @@ async def index(request: Request) -> HTTPResponse:
 
     return text("Task completed successfully!")
 
+
+app.run(host='0.0.0.0', port=1337, access_log=False, fast=True)
