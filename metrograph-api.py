@@ -5,14 +5,17 @@ from metrograph import task as MetroTask
 import os
 import uuid
 import aiofiles
+from sanic_cors import CORS, cross_origin
+
 
 app = Sanic("metrograph-api", env_prefix='METRO_')
+CORS(app)
 
 app.config.uploads_path = "/home/metrograph/uploads"
 app.config.flat_tasks_path = "/home/metrograph/flat_tasks/"
 app.config.guest_flat_task_path = '/usr/src/app'
 
-@app.post("/task")
+@app.route("/task", methods=['POST', 'OPTIONS'])
 async def index(request: Request) -> HTTPResponse:
     task_package = request.files.get("task_package")
     print(type(task_package))
