@@ -1,4 +1,3 @@
 docker
 sanic==21.12.1
 aiofiles==0.8.0
-sanic-cors
