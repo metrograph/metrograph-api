@@ -4,7 +4,7 @@ from typing import Dict, FrozenSet
 from sanic import Sanic, response
 from sanic.router import Route
 
-from cors import _add_cors_headers
+from .cors import _add_cors_headers
 
 
 def _compile_routes_needing_options(

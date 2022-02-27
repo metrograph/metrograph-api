@@ -5,17 +5,19 @@ from metrograph import task as MetroTask
 import os
 import uuid
 import aiofiles
-from sanic_cors import CORS, cross_origin
+
+
+from cors.cors import add_cors_headers
+from cors.options import setup_options
 
 
 app = Sanic("metrograph-api", env_prefix='METRO_')
-CORS(app)
 
 app.config.uploads_path = "/home/metrograph/uploads"
 app.config.flat_tasks_path = "/home/metrograph/flat_tasks/"
 app.config.guest_flat_task_path = '/usr/src/app'
 
-@app.route("/task", methods=['POST', 'OPTIONS'])
+@app.route("/task", methods=['POST'])
 async def index(request: Request) -> HTTPResponse:
     task_package = request.files.get("task_package")
     print(type(task_package))
@@ -44,5 +46,11 @@ async def index(request: Request) -> HTTPResponse:
         "task_id" : _t.task_uid
     })
 
+
+# Add OPTIONS handlers to any route that is missing it
+app.register_listener(setup_options, "before_server_start")
+
+# Fill in CORS headers
+app.register_middleware(add_cors_headers, "response")
 
 app.run(host='0.0.0.0', port=1337, access_log=False, fast=True)
