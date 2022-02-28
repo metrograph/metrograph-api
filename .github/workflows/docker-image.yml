@@ -18,17 +18,8 @@ jobs:
       
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/server:latest
-      
-      - name: Build image and push to Docker Hub and GitHub Container Registry
-        uses: docker/build-push-action@v2
-        with:
-          # relative path to the place where source code with Dockerfile is located
-          context: .
-          # Note: tags has to be all lower-case
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/server:latest
-          # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'main' }}
 
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.9.0
+        with:
+          tags: "latest"
