@@ -22,6 +22,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/server:$(date +%s)
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/server:latest
     - name: Push the image to Docker Hub
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/server
