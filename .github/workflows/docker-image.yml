@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  login:
+  repository-login:
     runs-on: ubuntu-latest
     steps:
       -
@@ -16,7 +16,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-  build:
+  image-build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
