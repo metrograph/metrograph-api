@@ -11,4 +11,4 @@ RUN mkdir -p /home/metrograph/flat_tasks
 
 COPY . .
 
-CMD [ "python", "./metrograph-api.py" ]
+CMD [ "python", "./start.py" ]
