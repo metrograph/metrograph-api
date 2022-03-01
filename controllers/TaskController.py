@@ -6,7 +6,6 @@ import os
 import uuid
 import aiofiles
 
-
 app = Sanic.get_app()
 
 @app.route("/", methods=['GET'])
@@ -16,8 +15,9 @@ async def index(request: Request) -> HTTPResponse:
         "message" : "hello"
     })
 
+#TODO: Validate input + manage exceptions
 @app.route("/task", methods=['POST'])
-async def index(request: Request) -> HTTPResponse:
+async def create_task(request: Request) -> HTTPResponse:
     task_package = request.files.get("task_package")
     print(type(task_package))
     
@@ -42,5 +42,27 @@ async def index(request: Request) -> HTTPResponse:
     return json({
         "status" : "success",
         "message" : "Task started successfully",
-        "task_id" : _t.task_uid
+        "payload" : {
+            "task_uid" : _t.task_uid
+        }
+    })
+
+#TODO: To implement
+@app.route("/task", methods=['POST', 'GET'])
+async def get_tasks(request: Request) -> HTTPResponse:
+    return json({
+        "status" : "success",
+        "message" : "Tasks retrieved successfully",
+        "payload" : []
+    })
+
+#TODO: To implement
+@app.route("/task", methods=['DELETE'])
+async def delete_task(request: Request) -> HTTPResponse:
+    return json({
+        "status" : "success",
+        "message" : "Task deleted successfully",
+        "payload" : {
+            "task_uid" : ""
+        }
     })
