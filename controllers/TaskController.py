@@ -48,7 +48,7 @@ async def create_task(request: Request) -> HTTPResponse:
     })
 
 #TODO: To implement
-@app.route("/task", methods=['POST', 'GET'])
+@app.route("/task", methods=['GET'])
 async def get_tasks(request: Request) -> HTTPResponse:
     return json({
         "status" : "success",
