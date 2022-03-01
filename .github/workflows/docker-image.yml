@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  repository-login:
+  buildnpush-image:
     runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
