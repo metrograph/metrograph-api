@@ -14,7 +14,7 @@ class Server:
 
         self.app = Sanic("metrograph-server", env_prefix='METRO_')
         self.app.config.compressed_packages_path = "/home/metrograph/uploads"
-        self.app.config.flat_packages_path = "/home/metrograph/flat_tasks"
+        self.app.config.flat_packages_path = "/home/metrograph/flat_tasks/"
         self.app.config.guest_flat_packages_path = '/usr/src/app'
 
     def setup_cors(self) -> None:

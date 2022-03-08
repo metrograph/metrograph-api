@@ -45,13 +45,13 @@ async def create_task(request: Request) -> HTTPResponse:
     if not os.path.exists(app.config.compressed_packages_path):
         os.makedirs(app.config.compressed_packages_path)
     
-    task_uuid = uuid.uuid4()
+    task_uuid = str(uuid.uuid4())
 
     async with aiofiles.open(f"{app.config.compressed_packages_path}/{task_uuid}.zip", 'wb') as f:
         await f.write(request.files["task_package"][0].body)
     f.close()
     
-    task = Task(uuid=task_uuid, task_config)
+    task = Task(uuid=task_uuid, config=task_config)
     task.save()
     
 
@@ -97,7 +97,7 @@ async def delete_task(request: Request) -> HTTPResponse:
 @app.route("/task/<uuid>/run", methods=['POST'])
 async def run_task(request: Request, uuid) -> HTTPResponse:
     print("stating running:"+uuid)
-    task = Task.get_task(uuid=uuid)
+    task = Task.get(uuid=uuid)
     task.run()
     return json({
         "status" : "success",

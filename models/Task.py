@@ -11,7 +11,7 @@ class Task:
 
     connection = Sanic.get_app().config.connection
 
-    def __init__(self, uuid:str, config: TaskConfig) -> None:
+    def __init__(self, uuid: str, config: TaskConfig) -> None:
 
         self.uuid = uuid
         self.config = config
@@ -29,7 +29,7 @@ class Task:
     def save(self) -> None:
         Task.connection.set(self.uuid, pickle.dumps(self))
 
-    def get_task(uuid: str):
+    def get(uuid: str):
         print(uuid)
         task_bytes = Task.connection.get(uuid)
         print("RESULT #########")
