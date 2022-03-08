@@ -4,17 +4,15 @@ from sanic import Sanic
 import uuid
 from db import Connection
 from metrograph import task as MetroTask
+from models.TaskConfig import TaskConfig
 
 class Task:
 
-    def __init__(self, 
-                    compressed_package_path : str = None,
-                    runtime : str = None,
-                    runtime_version: str = None
-    ) -> None:
+    def __init__(self, config: TaskConfig) -> None:
 
         self.uuid = str(uuid.uuid4())
-        self.task = MetroTask(task_path = f"{self.app.config.uploads_path}/{self.uuid}.zip", python_version=runtime_version, flat_task_path=self.app.config.flat_tasks_path)
+        self.config = config
+        self.task = MetroTask(task_path = f"{config.flat_package_path}/{self.uuid}.zip", python_version=config.runtime_version, flat_task_path=config.flat_package_path)
     
     def unpack(self) -> None:
         try:

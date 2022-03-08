@@ -6,6 +6,7 @@ import os
 import uuid
 import aiofiles
 from models.Task import Task
+from models.TaskConfig import TaskConfig
 from utils.RequestValidator import RequestValidator
 
 app = Sanic.get_app()
@@ -14,7 +15,7 @@ app = Sanic.get_app()
 async def index(request: Request) -> HTTPResponse:
     return json({
         "status" : "success",
-        "message" : "hello"
+        "message" : "API version: 0.0.1"
     })
 
 #TODO: Validate input + manage exceptions
@@ -24,7 +25,7 @@ async def create_task(request: Request) -> HTTPResponse:
     print(type(request.files.get("task_package")))
 
     validator = RequestValidator()
-    if not validator.validate([['task_package', File], 'task_name', 'runtime', 'runtime_version'], request):
+    if not validator.validate(required_files=['task_package'],required_input=['task_name', 'runtime', 'runtime_version'], request=request):
         print('validation failed')
         return json({
             "status" : "error",
@@ -35,38 +36,44 @@ async def create_task(request: Request) -> HTTPResponse:
     else:
         print('validation successful')
 
-    task = Task()
+    task_config = TaskConfig(
+                    compressed_package_path=app.config.compressed_packages_path, 
+                    flat_package_path=app.config.flat_packages_path,
+                    runtime=request.form.get('runtime'),
+                    runtime_version=request.form.get('runtime_version'))
+
+    task = Task(task_config)
 
 
     task_package = request.files.get("task_package")
     print(type(task_package))
     
     
-    language = request.form.get("language")
-    language_version = request.form.get("version")
+    runtime = request.form.get("runtime")
+    runtime_version = request.form.get("runtime_version")
 
-    if not os.path.exists(app.config.uploads_path):
-        os.makedirs(app.config.uploads_path)
+    if not os.path.exists(app.config.compressed_packages_path):
+        os.makedirs(app.config.compressed_packages_path)
 
     task_uid = str(uuid.uuid4())
     
     try:
-        async with aiofiles.open(f"{app.config.uploads_path}/{task_uid}.zip", 'wb') as f:
+        async with aiofiles.open(f"{app.config.compressed_packages_path}/{task_uid}.zip", 'wb') as f:
             await f.write(request.files["task_package"][0].body)
         f.close()
     except(Exception):
-        print('An error accured while uploading the task')
+        print(Exception)
 
-    _t = MetroTask(task_path = f"{app.config.uploads_path}/{task_uid}.zip", python_version=language_version, flat_task_path=app.config.flat_tasks_path)
-    _t.unpack()
-    _t.prepare()
-    _t.run()
+    #_t = MetroTask(task_path = f"{app.config.uploads_path}/{task_uid}.zip", python_version=language_version, flat_task_path=app.config.flat_tasks_path)
+    #_t.unpack()
+    #_t.prepare()
+    #_t.run()
 
     return json({
         "status" : "success",
         "message" : "Task started successfully",
         "payload" : {
-            "task_uid" : _t.task_uid
+            "task_uid" : task_uid
         }
     })
 
