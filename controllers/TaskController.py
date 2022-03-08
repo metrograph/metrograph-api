@@ -41,28 +41,25 @@ async def create_task(request: Request) -> HTTPResponse:
                     flat_package_path=app.config.flat_packages_path,
                     runtime=request.form.get('runtime'),
                     runtime_version=request.form.get('runtime_version'))
-
-    task = Task(task_config)
-
-
-    task_package = request.files.get("task_package")
-    print(type(task_package))
     
-    
-    runtime = request.form.get("runtime")
-    runtime_version = request.form.get("runtime_version")
-
     if not os.path.exists(app.config.compressed_packages_path):
         os.makedirs(app.config.compressed_packages_path)
-
-    task_uid = str(uuid.uuid4())
     
-    try:
-        async with aiofiles.open(f"{app.config.compressed_packages_path}/{task_uid}.zip", 'wb') as f:
-            await f.write(request.files["task_package"][0].body)
-        f.close()
-    except(Exception):
-        print(Exception)
+    task_uuid = uuid.uuid4()
+
+    async with aiofiles.open(f"{app.config.compressed_packages_path}/{task_uuid}.zip", 'wb') as f:
+        await f.write(request.files["task_package"][0].body)
+    f.close()
+    
+    task = Task(uuid=task_uuid, task_config)
+    task.save()
+    
+
+    
+
+
+
+
 
     #_t = MetroTask(task_path = f"{app.config.uploads_path}/{task_uid}.zip", python_version=language_version, flat_task_path=app.config.flat_tasks_path)
     #_t.unpack()
@@ -73,7 +70,7 @@ async def create_task(request: Request) -> HTTPResponse:
         "status" : "success",
         "message" : "Task started successfully",
         "payload" : {
-            "task_uid" : task_uid
+            "task_uid" : task.uuid
         }
     })
 
@@ -94,5 +91,18 @@ async def delete_task(request: Request) -> HTTPResponse:
         "message" : "Task deleted successfully",
         "payload" : {
             "task_uid" : ""
+        }
+    })
+
+@app.route("/task/<uuid>/run", methods=['POST'])
+async def run_task(request: Request, uuid) -> HTTPResponse:
+    print("stating running:"+uuid)
+    task = Task.get_task(uuid=uuid)
+    task.run()
+    return json({
+        "status" : "success",
+        "message" : "Task started successfully",
+        "payload" : {
+            "task_uid" : task.uuid
         }
     })
