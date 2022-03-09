@@ -31,7 +31,7 @@ async def get_tasks(request: Request) -> HTTPResponse:
     })
 
 @app.route("/task/<uuid>", methods=['GET'])
-async def get_tasks(request: Request, uuid) -> HTTPResponse:
+async def get_task(request: Request, uuid) -> HTTPResponse:
     return json({
         "status" : "success",
         "message" : "Task retreived successfully",
@@ -85,7 +85,7 @@ async def create_task(request: Request) -> HTTPResponse:
     })
 
 @app.route("/task/<uuid>", methods=['DELETE'])
-async def run_task(request: Request, uuid) -> HTTPResponse:
+async def delete_task(request: Request, uuid) -> HTTPResponse:
     Task.delete(uuid=uuid)
     return json({
         "status" : "success",
