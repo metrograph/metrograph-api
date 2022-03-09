@@ -28,7 +28,6 @@ async def get_tasks(request: Request) -> HTTPResponse:
         "payload" : {
             "tasks" : [t.__to_json__() for t in Task.get_all()]
         }
-        
     })
 
 #TODO: Validate input + manage exceptions
