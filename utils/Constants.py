@@ -1,0 +1,6 @@
+
+
+REQUEST_TYPE_FILE = 'TYPE_FILE'
+
+
+
