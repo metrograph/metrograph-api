@@ -12,3 +12,4 @@ dependencies:
   - metrograph==0.0.1.post1
   - redis==4.1.4
   - pickle5==0.0.12
+  - Sphinx==4.4.0

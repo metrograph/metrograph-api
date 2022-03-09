@@ -18,6 +18,17 @@ async def index(request: Request) -> HTTPResponse:
         "message" : "API version: 0.0.1"
     })
 
+@app.route("/task", methods=['GET'])
+async def get_tasks(request: Request) -> HTTPResponse:
+    tasks = Task.get_all()
+    return json({
+        "status" : "success",
+        "message" : "Tasks retreived successfully",
+        "payload" : {
+            "tasks" : tasks
+        }
+    })
+
 #TODO: Validate input + manage exceptions
 @app.route("/task", methods=['POST'])
 async def create_task(request: Request) -> HTTPResponse:
@@ -72,15 +83,6 @@ async def create_task(request: Request) -> HTTPResponse:
         "payload" : {
             "task_uid" : task.uuid
         }
-    })
-
-#TODO: To implement
-@app.route("/task", methods=['GET'])
-async def get_tasks(request: Request) -> HTTPResponse:
-    return json({
-        "status" : "success",
-        "message" : "Tasks retrieved successfully",
-        "payload" : []
     })
 
 #TODO: To implement

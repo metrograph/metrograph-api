@@ -29,6 +29,12 @@ class Task:
     def save(self) -> None:
         Task.connection.set(self.uuid, pickle.dumps(self))
 
+    def get_all() -> list:
+        tasks_uuids = []
+        for uuid in Task.connection.scan_iter("*"):
+            tasks_uuids.append(uuid.decode())
+        return tasks_uuids
+
     def get(uuid: str):
         print(uuid)
         task_bytes = Task.connection.get(uuid)
