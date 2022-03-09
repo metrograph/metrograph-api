@@ -87,8 +87,7 @@ async def delete_task(request: Request) -> HTTPResponse:
 
 @app.route("/task/<uuid>/run", methods=['POST'])
 async def run_task(request: Request, uuid) -> HTTPResponse:
-    print("stating running:"+uuid)
-    task = Task.get(uuid=uuid)
+    task = Task.get(uuid=f'task:{uuid}')
     task.run()
     return json({
         "status" : "success",

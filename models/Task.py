@@ -35,12 +35,13 @@ class Task:
 
     def get_all() -> list:
         tasks = []
-        for uuid in Task.connection.scan_iter("*"):
+        for uuid in Task.connection.scan_iter("task:*"):
             tasks.append(Task.get(uuid.decode()))
         return tasks
 
     def get(uuid: str):
-        task_bytes = Task.connection.get(uuid)
+        print(f'task:{uuid}')
+        task_bytes = Task.connection.get(f'{uuid}')
         object = pickle.loads(task_bytes)
         return object
 
