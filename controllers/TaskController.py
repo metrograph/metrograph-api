@@ -9,6 +9,8 @@ from models.Task import Task
 from models.TaskConfig import TaskConfig
 from utils.RequestValidator import RequestValidator
 
+from utils.ResponseEncoder import ResponseEncoder
+
 app = Sanic.get_app()
 
 @app.route("/", methods=['GET'])
@@ -20,12 +22,11 @@ async def index(request: Request) -> HTTPResponse:
 
 @app.route("/task", methods=['GET'])
 async def get_tasks(request: Request) -> HTTPResponse:
-    tasks = Task.get_all()
     return json({
         "status" : "success",
         "message" : "Tasks retreived successfully",
         "payload" : {
-            "tasks" : tasks
+            "tasks" : [t.__to_json__() for t in Task.get_all()]
         }
     })
 

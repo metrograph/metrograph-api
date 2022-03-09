@@ -12,4 +12,4 @@ app.config.connection = Connection().get_connection()
 from controllers import TaskController
 
 
-app.run(host='0.0.0.0', port=1337, access_log=False, fast=True)
+app.run(host='0.0.0.0', port=1337, access_log=False, fast=True, auto_reload=True)

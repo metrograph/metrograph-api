@@ -1,11 +1,9 @@
-from os import path
-import sys
+import json
 from sanic import Sanic
-from db import Connection
 from metrograph import task as MetroTask
 from models.TaskConfig import TaskConfig
 import pickle
-from db.Connection import Connection
+import pickle
 
 class Task:
 
@@ -15,8 +13,8 @@ class Task:
 
         self.uuid = uuid
         self.config = config
-        self.task = MetroTask(task_path = f"{config.compressed_package_path}/{self.uuid}.zip", python_version=config.runtime_version, flat_task_path=config.flat_package_path)
         
+        self.task = MetroTask(task_path = f"{config.compressed_package_path}/{self.uuid}.zip", python_version=config.runtime_version, flat_task_path=config.flat_package_path)
         self.task.unpack()
         self.task.prepare()
 
@@ -27,19 +25,22 @@ class Task:
         return f'{self.uuid}'
 
     def save(self) -> None:
-        Task.connection.set(self.uuid, pickle.dumps(self))
+        Task.connection.set(f'task:{self.uuid}', pickle.dumps(self))
 
     def get_all() -> list:
-        tasks_uuids = []
+        tasks = []
         for uuid in Task.connection.scan_iter("*"):
-            tasks_uuids.append(uuid.decode())
-        return tasks_uuids
+            tasks.append(Task.get(uuid.decode()))
+        return tasks
 
     def get(uuid: str):
-        print(uuid)
         task_bytes = Task.connection.get(uuid)
-        print("RESULT #########")
-        print(task_bytes)
         object = pickle.loads(task_bytes)
         return object
 
+    def __to_json__(self) -> json:
+        return {
+            "uuid": self.uuid,
+            "name": "test_task",
+            "config": self.config.__to_json__(),
+        }
