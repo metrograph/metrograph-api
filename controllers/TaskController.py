@@ -30,6 +30,16 @@ async def get_tasks(request: Request) -> HTTPResponse:
         }
     })
 
+@app.route("/task/<uuid>", methods=['GET'])
+async def get_tasks(request: Request, uuid) -> HTTPResponse:
+    return json({
+        "status" : "success",
+        "message" : "Task retreived successfully",
+        "payload" : {
+            "task" : Task.get(uuid).__to_json__()
+        }
+    })
+
 #TODO: Validate input + manage exceptions
 @app.route("/task", methods=['POST'])
 async def create_task(request: Request) -> HTTPResponse:
@@ -74,20 +84,20 @@ async def create_task(request: Request) -> HTTPResponse:
         }
     })
 
-#TODO: To implement
-@app.route("/task", methods=['DELETE'])
-async def delete_task(request: Request) -> HTTPResponse:
+@app.route("/task/<uuid>", methods=['DELETE'])
+async def run_task(request: Request, uuid) -> HTTPResponse:
+    Task.delete(uuid=uuid)
     return json({
         "status" : "success",
         "message" : "Task deleted successfully",
         "payload" : {
-            "task_uid" : ""
+            "task_uid" : uuid
         }
     })
 
 @app.route("/task/<uuid>/run", methods=['POST'])
 async def run_task(request: Request, uuid) -> HTTPResponse:
-    task = Task.get(uuid=f'task:{uuid}')
+    task = Task.get(uuid=f'{uuid}')
     task.run()
     return json({
         "status" : "success",
@@ -96,3 +106,5 @@ async def run_task(request: Request, uuid) -> HTTPResponse:
             "task_uid" : task.uuid
         }
     })
+
+

@@ -36,14 +36,17 @@ class Task:
     def get_all() -> list:
         tasks = []
         for uuid in Task.connection.scan_iter("task:*"):
-            tasks.append(Task.get(uuid.decode()))
+            tasks.append(pickle.loads(Task.connection.get(f'{uuid.decode()}')))
         return tasks
 
     def get(uuid: str):
-        print(f'task:{uuid}')
-        task_bytes = Task.connection.get(f'{uuid}')
-        object = pickle.loads(task_bytes)
-        return object
+        return pickle.loads(Task.connection.get(f'task:{uuid}'))
+
+    def delete(self) -> None:
+        Task.connection.delete(f'task:{self.uuid}')
+
+    def delete(uuid) -> None:
+        Task.connection.delete(f'task:{uuid}')
 
     def __to_json__(self) -> json:
         return {
