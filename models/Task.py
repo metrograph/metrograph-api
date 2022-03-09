@@ -9,9 +9,15 @@ class Task:
 
     connection = Sanic.get_app().config.connection
 
-    def __init__(self, uuid: str, config: TaskConfig) -> None:
+    def __init__(
+                    self, uuid: str, 
+                    name:str, 
+                    description: str,
+                    config: TaskConfig) -> None:
 
         self.uuid = uuid
+        self.name = name
+        self.description = description
         self.config = config
         
         self.task = MetroTask(task_path = f"{config.compressed_package_path}/{self.uuid}.zip", python_version=config.runtime_version, flat_task_path=config.flat_package_path)
@@ -41,6 +47,7 @@ class Task:
     def __to_json__(self) -> json:
         return {
             "uuid": self.uuid,
-            "name": "test_task",
+            "task_name": self.name,
+            "task_description": self.description,
             "config": self.config.__to_json__(),
         }

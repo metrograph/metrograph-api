@@ -63,26 +63,14 @@ async def create_task(request: Request) -> HTTPResponse:
         await f.write(request.files["task_package"][0].body)
     f.close()
     
-    task = Task(uuid=task_uuid, config=task_config)
+    task = Task(uuid=task_uuid, name=request.form.get("task_name"), description=request.form.get("task_description"), config=task_config)
     task.save()
-    
-
-    
-
-
-
-
-
-    #_t = MetroTask(task_path = f"{app.config.uploads_path}/{task_uid}.zip", python_version=language_version, flat_task_path=app.config.flat_tasks_path)
-    #_t.unpack()
-    #_t.prepare()
-    #_t.run()
 
     return json({
         "status" : "success",
         "message" : "Task started successfully",
         "payload" : {
-            "task_uid" : task.uuid
+            "task" : task.__to_json__()
         }
     })
 

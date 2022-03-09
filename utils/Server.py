@@ -13,9 +13,11 @@ class Server:
     def __init__(self) -> None:
 
         self.app = Sanic("metrograph-server", env_prefix='METRO_')
-        self.app.config.compressed_packages_path = "/home/metrograph/uploads"
-        self.app.config.flat_packages_path = "/home/metrograph/flat_tasks/"
-        self.app.config.guest_flat_packages_path = '/usr/src/app'
+        self.app.config.update_config("${METRO_CONFIG_FILE}")
+
+        self.app.config.compressed_packages_path = self.app.config.COMPRESSED_PACKAGES_PATH
+        self.app.config.flat_packages_path = self.app.config.FLAT_PACKAGES_PATH
+        self.app.config.guest_flat_packages_path = self.app.config.GUEST_FLAT_PACKAGES_PATH
 
     def setup_cors(self) -> None:
         # Add OPTIONS handlers to any route that is missing it
