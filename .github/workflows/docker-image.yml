@@ -21,3 +21,16 @@ jobs:
         with:
           push: true
           tags: metrograph/server:latest
+          
+      # Deploys the new Docker Image to the server
+      - name: Deploying the new image on the server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_PRIVATE_KEY }}
+          port: ${{ secrets.HETZNER_PORT }}
+          script: |
+          docker stop $(docker ps -a -q)
+          docker rm $(docker ps -a -q)
+          docker run -d -e METRO_CONFIG_FILE=.env.prod -v /var/run/docker.sock:/var/run/docker.sock -v /home/metrograph/compressed_packages:/home/metrograph/compressed_packages_path -v /home/metrograph/flat_tasks:/home/metrograph/flat_tasks -p 80:1337 metrograph/server
