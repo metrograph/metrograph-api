@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  buildnpush-image:
+  imagepush-imagedeploy:
   
     runs-on: ubuntu-latest
     steps:
@@ -18,17 +18,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           push: true
           tags: metrograph/server:latest
           
-  deploy-image:
-  
-    runs-on: ubuntu-latest
-    steps:
-      # Deploys the new Docker Image to the server
+          
       - name: Deploying the new image on the server
         uses: appleboy/ssh-action@master
         with:
