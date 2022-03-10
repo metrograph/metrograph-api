@@ -31,4 +31,4 @@ For more setup customization (changing ports, cloud deployment, production best 
 
 ## License
 
-See the [LICENSE](https://github.com/airbytehq/airbyte/blob/master/docs/project-overview/licenses) file for licensing information, and our [FAQ](https://github.com/airbytehq/airbyte/blob/master/docs/project-overview/licenses/license-faq.md) for any questions you may have on that topic.
+See the [LICENSE](https://github.com/metrograph) file for licensing information, and our [FAQ](https://github.com/metrograph) for any questions you may have on that topic.
