@@ -24,11 +24,14 @@ class Task:
         self.task.unpack()
         self.task.prepare()
 
-    def run(self) -> None:
-        self.task.run()
-
     def __str__(self) -> str:
         return f'{self.uuid}'
+
+    def exists(uuid) -> bool:
+        return Task.connection.get(f'task:{uuid}') != None
+
+    def run(self) -> None:
+        self.task.run()
 
     def save(self) -> None:
         Task.connection.set(f'task:{self.uuid}', pickle.dumps(self))

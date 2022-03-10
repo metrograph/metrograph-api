@@ -1,7 +1,6 @@
 from sanic import Sanic
-from sanic.request import Request, File
+from sanic.request import Request
 from sanic.response import HTTPResponse, text, json
-from metrograph import task as MetroTask
 import os
 import uuid
 import aiofiles
@@ -32,6 +31,23 @@ async def get_tasks(request: Request) -> HTTPResponse:
 
 @app.route("/task/<uuid>", methods=['GET'])
 async def get_task(request: Request, uuid) -> HTTPResponse:
+
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Task.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Task not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+
     return json({
         "status" : "success",
         "message" : "Task retreived successfully",
@@ -40,23 +56,24 @@ async def get_task(request: Request, uuid) -> HTTPResponse:
         }
     })
 
-#TODO: Validate input + manage exceptions
 @app.route("/task", methods=['POST'])
 async def create_task(request: Request) -> HTTPResponse:
 
-    print(type(request.files.get("task_package")))
-
-    validator = RequestValidator()
-    if not validator.validate(required_files=['task_package'],required_input=['task_name', 'runtime', 'runtime_version'], request=request):
-        print('validation failed')
+    if not RequestValidator().validate(required_files=['task_package'],required_input=['task_name', 'runtime', 'runtime_version'], request=request):
         return json({
             "status" : "error",
-            "message" : "Invalid request",
+            "message" : "Bad request",
             "payload" : {}},
             status=400
         )
-    else:
-        print('validation successful')
+    
+    if not request.files["task_package"][0].name.endswith('.zip'):
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}},
+            status=400
+        )
 
     task_config = TaskConfig(
                     compressed_package_path=app.config.compressed_packages_path, 
@@ -78,7 +95,7 @@ async def create_task(request: Request) -> HTTPResponse:
 
     return json({
         "status" : "success",
-        "message" : "Task started successfully",
+        "message" : "Task created successfully",
         "payload" : {
             "task" : task.__to_json__()
         }
@@ -86,6 +103,23 @@ async def create_task(request: Request) -> HTTPResponse:
 
 @app.route("/task/<uuid>", methods=['DELETE'])
 async def delete_task(request: Request, uuid) -> HTTPResponse:
+    
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Task.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Task not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+    
     Task.delete(uuid=uuid)
     return json({
         "status" : "success",
@@ -97,6 +131,23 @@ async def delete_task(request: Request, uuid) -> HTTPResponse:
 
 @app.route("/task/<uuid>/run", methods=['POST'])
 async def run_task(request: Request, uuid) -> HTTPResponse:
+    
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Task.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Task not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+    
     task = Task.get(uuid=f'{uuid}')
     task.run()
     return json({
