@@ -7,7 +7,9 @@ on:
     branches: [ main ]
 
 jobs:
+
   buildnpush-image:
+  
     runs-on: ubuntu-latest
     steps:
       - name: Login to Docker Hub
@@ -22,6 +24,10 @@ jobs:
           push: true
           tags: metrograph/server:latest
           
+  deploy-image:
+  
+    runs-on: ubuntu-latest
+    steps:
       # Deploys the new Docker Image to the server
       - name: Deploying the new image on the server
         uses: appleboy/ssh-action@master
