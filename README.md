@@ -24,6 +24,9 @@ Installing Metrograph takes only one command!
 
     bash <(curl -sL install.mtrgr.ph)
 
+
+![](https://i.imgur.com/wSI27aJ.png)
+
 Follow the guided installation steps, and once done, visit http://localhost:9090 !
 
 ## Documentation
