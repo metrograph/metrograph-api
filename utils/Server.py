@@ -5,6 +5,7 @@ sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
 from sanic import Sanic
 from cors.cors import add_cors_headers
 from cors.options import setup_options
+import db.Connection as Connection
 
 class Server:
 
@@ -22,3 +23,9 @@ class Server:
     def setup_cors(self) -> None:
         self.app.register_listener(setup_options, "before_server_start")
         self.app.register_middleware(add_cors_headers, "response")
+
+    def setup_jwt(self) -> None:
+        pass
+
+    def setup_db(self) -> None:
+        self.app.config.connection = Connection().get_connection()

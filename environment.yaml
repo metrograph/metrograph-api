@@ -13,3 +13,4 @@ dependencies:
   - redis==4.1.4
   - pickle5==0.0.12
   - Sphinx==4.4.0
+  - pyjwt==2.3.0
