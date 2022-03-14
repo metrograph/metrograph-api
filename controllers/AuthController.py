@@ -3,6 +3,8 @@ from models.User import User
 from sanic import Request, Blueprint, HTTPResponse, json
 from utils.RequestValidator import RequestValidator
 import jwt
+from datetime import datetime
+from middleware.Auth import authentificate
 
 auth_bp = Blueprint('auth', url_prefix='auth', version=1)
 
@@ -65,7 +67,9 @@ async def authentificate(request: Request) -> HTTPResponse:
             "payload" : {}
         }, status = 401)
     
-    user.update_token(jwt.encode({}, request.app.config.SECRET))
+    user.update_token(jwt.encode({  "user": user.__to_dict__(), 
+                                    "time": str(datetime.today().timestamp())
+                                    }, request.app.config.SECRET))
 
     return json({
         "status" : "success",

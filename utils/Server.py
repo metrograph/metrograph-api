@@ -1,7 +1,3 @@
-from os import path
-import sys
-sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))
-
 from sanic import Sanic
 from cors.cors import add_cors_headers
 from cors.options import setup_options
