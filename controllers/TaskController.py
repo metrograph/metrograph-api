@@ -10,6 +10,7 @@ from utils.RequestValidator import RequestValidator
 from utils.ResponseEncoder import ResponseEncoder
 from middleware.Auth import protected
 
+app = Sanic.get_app()
 task_bp = Blueprint('task', url_prefix='task', version=1)
 
 @task_bp.route("/", methods=['GET'])
