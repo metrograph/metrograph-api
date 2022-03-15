@@ -12,7 +12,7 @@ auth_bp = Blueprint('auth', url_prefix='auth', version=1)
 async def register(request: Request) -> HTTPResponse:
     
     validator = RequestValidator()
-    if validator.validate(request=request, required_files=[], required_input=['username', 'password']):
+    if not validator.validate(request=request, required_files=[], required_input=['username', 'password']):
         return json({
             "status" : "error",
             "message" : "Bad request",
