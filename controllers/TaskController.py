@@ -10,16 +10,9 @@ from utils.RequestValidator import RequestValidator
 from utils.ResponseEncoder import ResponseEncoder
 from middleware.Auth import protected
 
-app = Sanic.get_app()
+task_bp = Blueprint('task', url_prefix='task', version=1)
 
-@app.route("/", methods=['GET'])
-async def index(request: Request) -> HTTPResponse:
-    return json({
-        "status" : "success",
-        "message" : "API version: 0.0.1"
-    })
-
-@app.route("/task", methods=['GET'])
+@task_bp.route("/", methods=['GET'])
 @protected
 async def get_tasks(request: Request) -> HTTPResponse:
     return json({
@@ -30,7 +23,7 @@ async def get_tasks(request: Request) -> HTTPResponse:
         }
     })
 
-@app.route("/task/<uuid>", methods=['GET'])
+@task_bp.route("/<uuid>", methods=['GET'])
 @protected
 async def get_task(request: Request, uuid) -> HTTPResponse:
 
@@ -58,7 +51,7 @@ async def get_task(request: Request, uuid) -> HTTPResponse:
         }
     })
 
-@app.route("/task", methods=['POST'])
+@task_bp.route("/", methods=['POST'])
 @protected
 async def create_task(request: Request) -> HTTPResponse:
 
@@ -104,7 +97,7 @@ async def create_task(request: Request) -> HTTPResponse:
         }
     })
 
-@app.route("/task/<uuid>", methods=['DELETE'])
+@task_bp.route("/<uuid>", methods=['DELETE'])
 @protected
 async def delete_task(request: Request, uuid) -> HTTPResponse:
     
@@ -133,7 +126,7 @@ async def delete_task(request: Request, uuid) -> HTTPResponse:
         }
     })
 
-@app.route("/task/<uuid>/run", methods=['POST'])
+@task_bp.route("/<uuid>/run", methods=['POST'])
 @protected
 async def run_task(request: Request, uuid) -> HTTPResponse:
     
