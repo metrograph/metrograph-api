@@ -3,3 +3,4 @@ sanic==21.12.1
 aiofiles==0.8.0
 redis==4.1.4
 pyjwt==2.3.0
+bcrypt==3.2.0

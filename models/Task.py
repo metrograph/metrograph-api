@@ -2,12 +2,10 @@ import json
 from sanic import Sanic
 from metrograph import task as MetroTask
 from models.TaskConfig import TaskConfig
-import pickle
+from db.Connection import Connection
 import pickle
 
 class Task:
-
-    connection = Sanic.get_app().config.connection
 
     def __init__(
                     self, uuid: str, 
@@ -28,28 +26,28 @@ class Task:
         return f'{self.uuid}'
 
     def exists(uuid) -> bool:
-        return Task.connection.get(f'task:{uuid}') != None
+        return Connection.get_connection().get(f'task:{uuid}') != None
 
     def run(self) -> None:
         self.task.run()
 
     def save(self) -> None:
-        Task.connection.set(f'task:{self.uuid}', pickle.dumps(self))
+        Connection.get_connection().set(f'task:{self.uuid}', pickle.dumps(self))
 
     def get_all() -> list:
         tasks = []
-        for uuid in Task.connection.scan_iter("task:*"):
-            tasks.append(pickle.loads(Task.connection.get(f'{uuid.decode()}')))
+        for uuid in Connection.get_connection().scan_iter("task:*"):
+            tasks.append(pickle.loads(Connection.get_connection().get(f'{uuid.decode()}')))
         return tasks
 
     def get(uuid: str):
-        return pickle.loads(Task.connection.get(f'task:{uuid}'))
+        return pickle.loads(Connection.get_connection().get(f'task:{uuid}'))
 
     def delete(self) -> None:
-        Task.connection.delete(f'task:{self.uuid}')
+        Connection.get_connection().delete(f'task:{self.uuid}')
 
     def delete(uuid) -> None:
-        Task.connection.delete(f'task:{uuid}')
+        Connection.get_connection().delete(f'task:{uuid}')
 
     def __to_json__(self) -> json:
         return {

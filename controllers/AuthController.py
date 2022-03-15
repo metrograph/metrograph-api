@@ -4,7 +4,7 @@ from sanic import Request, Blueprint, HTTPResponse, json
 from utils.RequestValidator import RequestValidator
 import jwt
 from datetime import datetime
-from middleware.Auth import authentificate
+import bcrypt
 
 auth_bp = Blueprint('auth', url_prefix='auth', version=1)
 
@@ -22,12 +22,13 @@ async def register(request: Request) -> HTTPResponse:
     if User.exists(username=request.json['username']):
         return json({
             "status" : "error",
-            "message" : "Bad request",
+            "message" : "Conflict",
             "payload" : {}
         }, status = 409)
 
     user_uuid = str(uuid4())
-    user = User(uuid=user_uuid, username=request.json['username'], password=request.json['password'])
+    hashed_pw = bcrypt.hashpw(str.encode(request.json['password']), bcrypt.gensalt())
+    user = User(uuid=user_uuid, username=request.json['username'], password=hashed_pw.decode())
     user.save()
     
     return json({
@@ -42,7 +43,7 @@ async def register(request: Request) -> HTTPResponse:
 async def authentificate(request: Request) -> HTTPResponse:
 
     validator = RequestValidator()
-    if validator.validate(request=request, required_files=[], required_input=['username', 'password']):
+    if not validator.validate(request=request, required_files=[], required_input=['username', 'password']):
         return json({
             "status" : "error",
             "message" : "Bad request",
@@ -59,7 +60,7 @@ async def authentificate(request: Request) -> HTTPResponse:
     
     user = User.get_by_username(username=request.json['username'])
 
-    if not user.password == request.json['password']:
+    if not bcrypt.checkpw(str.encode(request.json['password']), str.encode(user.password)):
         print('incorrect passwor')
         return json({
             "status" : "error",

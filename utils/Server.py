@@ -2,6 +2,7 @@ from sanic import Sanic
 from cors.cors import add_cors_headers
 from cors.options import setup_options
 import db.Connection as Connection
+from middleware.Auth import protected
 
 class Server:
 
@@ -24,4 +25,8 @@ class Server:
         pass
 
     def setup_db(self) -> None:
-        self.app.config.connection = Connection().get_connection()
+        self.app.config.connection = Connection.get_connection()
+
+    def setup_middleware(self) -> None:
+        pass
+        #self.app.register_middleware(authentificate, "request")

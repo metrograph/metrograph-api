@@ -5,6 +5,7 @@ server = Server.Server()
 server.setup_cors()
 server.setup_jwt()
 server.setup_db()
+server.setup_middleware()
 
 app = Sanic.get_app()
 app.config.SECRET = "KEEP_IT_SECRET_KEEP_IT_SAFE"
