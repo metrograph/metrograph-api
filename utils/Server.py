@@ -21,12 +21,7 @@ class Server:
         self.app.register_listener(setup_options, "before_server_start")
         self.app.register_middleware(add_cors_headers, "response")
 
-    def setup_jwt(self) -> None:
-        pass
-
     def setup_db(self) -> None:
         self.app.config.connection = Connection.get_connection()
 
-    def setup_middleware(self) -> None:
-        pass
-        #self.app.register_middleware(authentificate, "request")
+
