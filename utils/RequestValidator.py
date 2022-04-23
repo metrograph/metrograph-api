@@ -1,7 +1,3 @@
-
-
-
-
 from array import array
 from unittest import case
 from sanic.request import Request

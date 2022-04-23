@@ -18,9 +18,16 @@ def _add_cors_headers(response, methods: Iterable[str]) -> None:
 
 
 def add_cors_headers(request, response):
+    #try:
+    print(request.route)
     if request.method != "OPTIONS":
+        print("#####################")
+        print(request)
         methods = [method for method in request.route.methods]
+        print(methods)
         _add_cors_headers(response, methods)
+    #except:
+    #    _add_cors_headers(response, methods = [])
 
  
 

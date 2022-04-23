@@ -5,6 +5,7 @@ from utils.RequestValidator import RequestValidator
 import jwt
 from datetime import datetime
 import bcrypt
+from middleware.Auth import protected
 
 auth_bp = Blueprint('auth', url_prefix='auth', version=1)
 
