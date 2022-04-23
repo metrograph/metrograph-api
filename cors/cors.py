@@ -16,18 +16,15 @@ def _add_cors_headers(response, methods: Iterable[str]) -> None:
     }
     response.headers.extend(headers)
 
+#TODO: THIS METHOD IS BASICALLY USELESS, IT ONLY CALLS THE PREVIOUS ONE -> ALL CORS ARE OPEN
 
 def add_cors_headers(request, response):
-    #try:
-    print(request.route)
-    if request.method != "OPTIONS":
-        print("#####################")
-        print(request)
-        methods = [method for method in request.route.methods]
-        print(methods)
-        _add_cors_headers(response, methods)
-    #except:
-    #    _add_cors_headers(response, methods = [])
+    try:
+        if request.method != "OPTIONS":
+            methods = [method for method in request.route.methods]
+            _add_cors_headers(response, methods)
+    except:
+        _add_cors_headers(response, methods = [])
 
  
 

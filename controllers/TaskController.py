@@ -98,7 +98,7 @@ async def create_task(request: Request) -> HTTPResponse:
         }
     })
 
-@task_bp.route("/<uuid>", methods=['DELETE'])
+@task_bp.route("/<uuid>", methods=['DELETE'], ignore_body=False)
 @protected
 async def delete_task(request: Request, uuid) -> HTTPResponse:
     
