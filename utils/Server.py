@@ -26,5 +26,5 @@ class Server:
         self.app.config.connection = Connection.get_connection()
 
     def setup_scheduler(self) -> None:
-        self.app.config.scheduler = start_scheduler()
+        #self.app.config.scheduler = start_scheduler()
         pass
