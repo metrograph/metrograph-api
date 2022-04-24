@@ -5,9 +5,9 @@ import os
 import uuid
 import aiofiles
 from models.Task import Task
+from scheduler.Scheduler import schedule_task
 from models.TaskConfig import TaskConfig
 from utils.RequestValidator import RequestValidator
-from utils.ResponseEncoder import ResponseEncoder
 from middleware.Auth import protected
 
 app = Sanic.get_app()
@@ -157,4 +157,37 @@ async def run_task(request: Request, uuid) -> HTTPResponse:
         }
     })
 
+@task_bp.route("/<uuid>/schedule", methods=['POST'])
+async def schedule_task_(request: Request, uuid) -> HTTPResponse:
+    
+    if Task.exists(uuid):
 
+        days = request.json.get('days')
+        hours = request.json.get('hours')
+        minutes = request.json.get('minutes')
+        seconds = request.json.get('seconds')
+        at = request.json.get('at')
+
+        if schedule_task(uuid, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at):        
+            return json({
+                "status" : "success",
+                "message" : "Task scheduled successfully",
+                "payload" : {
+                    "task_uid" : uuid
+                }
+            })
+        else:
+            return json({
+                "status" : "error",
+                "message" : "Bad request",
+                "payload" : {}
+            }, status = 400)
+
+    else:
+        return json({
+            "status" : "error",
+            "message" : "Task not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)

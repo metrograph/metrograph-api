@@ -4,6 +4,7 @@ from utils import Server
 server = Server.Server()
 server.setup_cors()
 server.setup_db()
+server.setup_scheduler()
 
 
 app = Sanic.get_app()
