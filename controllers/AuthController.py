@@ -67,7 +67,7 @@ async def authentificate(request: Request) -> HTTPResponse:
             "payload" : {}
         }, status = 401)
     
-    user.update_token(jwt.encode({  "user": user.username, 
+    user.update_token(jwt.encode({  "user": {"username" : user.username}, 
                                     "time": str(datetime.today().timestamp())
                                     }, request.app.config.SECRET))
 
