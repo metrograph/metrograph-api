@@ -52,7 +52,6 @@ async def authentificate(request: Request) -> HTTPResponse:
         }, status = 400)
     
     if not User.exists(username=request.json['username']):
-        print('incorrect username')
         return json({
             "status" : "error",
             "message" : "Unauthorized",
@@ -62,14 +61,13 @@ async def authentificate(request: Request) -> HTTPResponse:
     user = User.get_by_username(username=request.json['username'])
 
     if not bcrypt.checkpw(str.encode(request.json['password']), str.encode(user.password)):
-        print('incorrect passwor')
         return json({
             "status" : "error",
             "message" : "Unauthorized",
             "payload" : {}
         }, status = 401)
     
-    user.update_token(jwt.encode({  "user": user.__to_dict__(), 
+    user.update_token(jwt.encode({  "user": user.username, 
                                     "time": str(datetime.today().timestamp())
                                     }, request.app.config.SECRET))
 
