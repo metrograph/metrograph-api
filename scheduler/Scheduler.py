@@ -37,7 +37,30 @@ def background_task(task_uuid: str):
 def schedule_task(task_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None) -> bool:
     
     if weeks:
-        schedule.every(weeks).weeks.do(background_task, task_uuid=task_uuid)
+        if at:
+            week_day, day_time = at.split(' ')[0].lower(), at.split(' ')[1].lower()
+            pattern = re.compile("^[0-1][0-9]:[0-5][0-9]:[0-5][0-9]$|^[2][0-3]:[0-5][0-9]:[0-5][0-9]$")
+            if pattern.match(day_time):
+                if week_day == "monday":
+                    schedule.every(weeks).monday.at(day_time).do(background_task, task_uuid=task_uuid)
+                elif week_day == "tuesday":
+                    schedule.every(weeks).tuesday.at(day_time).do(background_task, task_uuid=task_uuid)
+                elif week_day == "wednesday":
+                    schedule.every(weeks).wednesday.at(day_time).do(background_task, task_uuid=task_uuid)
+                elif week_day == "thursday":
+                    schedule.every(weeks).thursday.at(day_time).do(background_task, task_uuid=task_uuid)
+                elif week_day == "friday":
+                    schedule.every(weeks).friday.at(day_time).do(background_task, task_uuid=task_uuid)
+                elif week_day == "saturday":
+                    schedule.every(weeks).saturday.at(day_time).do(background_task, task_uuid=task_uuid)
+                elif week_day == "sunday":
+                    schedule.every(weeks).sunday.at(day_time).do(background_task, task_uuid=task_uuid)
+                else:
+                    return False
+            else:
+                return False
+        else:
+            schedule.every(weeks).weeks.do(background_task, task_uuid=task_uuid)
     elif days:
         if at:
             pattern = re.compile("^[0-1][0-9]:[0-5][0-9]:[0-5][0-9]$|^[2][0-3]:[0-5][0-9]:[0-5][0-9]$")

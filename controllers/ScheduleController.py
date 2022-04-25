@@ -33,16 +33,23 @@ async def create_schedule(request: Request) -> HTTPResponse:
 
         schedule = Schedule(uuid=str(uuid.uuid4()), task_uuid=task_uuid, \
                             weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at)
-        schedule.start()
-        schedule.save()
+        if schedule.start():
+            schedule.save()
 
-        return json({
-            "status" : "success",
-            "message" : "Schedule created successfully",
-            "payload" : {
-                "task" : schedule.__to_json__()
-            }
-        })
+            return json({
+                "status" : "success",
+                "message" : "Schedule created successfully",
+                "payload" : {
+                    "task" : schedule.__to_json__()
+                }
+            })
+        else:
+                return json({
+                "status" : "error",
+                "message" : "Bad request",
+                "payload" : {}},
+                status=400
+            )
 
     else:
         return json({
