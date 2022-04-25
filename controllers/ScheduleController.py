@@ -55,4 +55,27 @@ async def create_schedule(request: Request) -> HTTPResponse:
 @schedule_bp.route('/<uuid>', methods=['DELETE'])
 @protected
 async def delete_schedule(request:Request, uuid:str) -> HTTPResponse:
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Schedule.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Schedule not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
     
+    Schedule.delete(uuid=uuid)
+    return json({
+        "status" : "success",
+        "message" : "Schedule deleted successfully",
+        "payload" : {
+            "task_uid" : uuid
+        }
+    })
