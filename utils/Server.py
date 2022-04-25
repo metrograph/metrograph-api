@@ -4,6 +4,7 @@ from cors.options import setup_options
 import db.Connection as Connection
 from middleware.Auth import protected
 from scheduler.Scheduler import start_scheduler
+from models.Schedule import Schedule
 
 class Server:
 
@@ -25,6 +26,7 @@ class Server:
     def setup_db(self) -> None:
         self.app.config.connection = Connection.get_connection()
 
-    def setup_scheduler(self) -> None:
-        #self.app.config.scheduler = start_scheduler()
-        pass
+    def resume_schedules(self) -> None:
+        schedules = Schedule.get_all()
+        for schedule in schedules:
+            print(schedule)

@@ -51,3 +51,8 @@ async def create_schedule(request: Request) -> HTTPResponse:
             "payload" : {}},
             status=400
         )
+
+@schedule_bp.route('/<uuid>', methods=['DELETE'])
+@protected
+async def delete_schedule(request:Request, uuid:str) -> HTTPResponse:
+    
