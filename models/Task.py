@@ -11,12 +11,14 @@ class Task:
                     self, uuid: str, 
                     name:str, 
                     description: str,
-                    config: TaskConfig) -> None:
+                    config: TaskConfig,
+                    url_enabled: bool = False) -> None:
 
         self.uuid = uuid
         self.name = name
         self.description = description
         self.config = config
+        self.url_enabled = url_enabled
         
         self.task = MetroTask(task_path = f"{config.compressed_package_path}/{self.uuid}.zip", python_version=config.runtime_version, flat_task_path=config.flat_package_path)
         self.task.unpack()
@@ -52,7 +54,8 @@ class Task:
     def __to_json__(self) -> json:
         return {
             "uuid": self.uuid,
-            "task_name": self.name,
-            "task_description": self.description,
-            "config": self.config.__to_json__(),
+            "name": self.name,
+            "description": self.description,
+            "url_enabled": self.url_enabled,
+            "config": self.config.__to_json__()
         }

@@ -87,7 +87,7 @@ async def create_task(request: Request) -> HTTPResponse:
         await f.write(request.files["task_package"][0].body)
     f.close()
     
-    task = Task(uuid=task_uuid, name=request.form.get("task_name"), description=request.form.get("task_description"), config=task_config)
+    task = Task(uuid=task_uuid, name=request.form.get("task_name"), description=request.form.get("task_description"), config=task_config, url_enabled=request.form.get("url_enabled") in [1, "1", "true", "yes"])
     task.save()
 
     return json({
@@ -158,6 +158,7 @@ async def run_task(request: Request, uuid) -> HTTPResponse:
     })
 
 @task_bp.route("/<uuid>/schedule", methods=['POST'])
+@protected
 async def schedule_task_(request: Request, uuid) -> HTTPResponse:
     
     if Task.exists(uuid):
