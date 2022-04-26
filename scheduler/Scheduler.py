@@ -1,3 +1,4 @@
+from sanic import Sanic
 from db.Connection import Connection
 import threading
 import time
@@ -5,6 +6,7 @@ import schedule
 import re
 from models.Task import Task
 from redis.commands.json.path import Path
+
 
 def run_continuously(interval=1):
     
@@ -47,7 +49,6 @@ def background_task(schedule_uuid:str, task_uuid: str):
     else:
         print("task or schedule non existing, quitting..")
         return schedule.CancelJob
-
 
 def schedule_task(schedule_uuid:str, task_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None) -> bool:
     
@@ -116,7 +117,12 @@ def schedule_task(schedule_uuid:str, task_uuid: str, weeks=None, days=None, hour
     # Stop the background thread
     #stop_run_continuously.set()
 
+async def start_background_scheduler(app):
+    print("#################### starting global scheduler")
+    scheduler_thread = run_continuously()
+    app.ctx.scheduler_thread = scheduler_thread
 
-def start_scheduler():
-    stop_run_continuously = run_continuously()
-    return stop_run_continuously
+async def stop_background_scheduler(app):
+    print("#################### stopping global scheduler")
+    scheduler_thread = app.ctx.scheduler_thread
+    scheduler_thread.set()

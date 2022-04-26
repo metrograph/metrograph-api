@@ -4,8 +4,7 @@ from utils import Server
 server = Server.Server()
 server.setup_cors()
 server.setup_db()
-server.resume_schedules()
-
+server.setup_scheduler()
 
 app = Sanic.get_app()
 app.config.SECRET = "KEEP_IT_SECRET_KEEP_IT_SAFE"

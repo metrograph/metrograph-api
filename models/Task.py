@@ -30,6 +30,15 @@ class Task:
     def exists(uuid) -> bool:
         return Connection.get_connection().get(f'task:{uuid}') != None
 
+    #TODO: to implement
+
+    def is_url_enabled(uuid) -> bool:
+        if Task.exists(uuid=uuid) and hasattr(Task.get(uuid=uuid), 'url_enabled'):
+            sc = Task.get(uuid=uuid)
+            if sc.url_enabled:
+                return sc.url_enabled
+        return False
+
     def run(self) -> None:
         self.task.run()
 

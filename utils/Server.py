@@ -2,13 +2,9 @@ from sanic import Sanic
 from cors.cors import add_cors_headers
 from cors.options import setup_options
 import db.Connection as Connection
-from middleware.Auth import protected
-from scheduler.Scheduler import start_scheduler
-from models.Schedule import Schedule
+from scheduler.Scheduler import start_background_scheduler, stop_background_scheduler
 
 class Server:
-
-    #TODO: Get constants from a config file / env variables instead of hardcoding them
 
     def __init__(self) -> None:
 
@@ -26,7 +22,9 @@ class Server:
     def setup_db(self) -> None:
         self.app.config.connection = Connection.get_connection()
 
-    def resume_schedules(self) -> None:
-        schedules = Schedule.get_all()
-        for schedule in schedules:
-            print(schedule)
+    def setup_scheduler(self) -> None:
+        #schedules = Schedule.get_all()
+        # for schedule in schedules:
+            # print(schedule)
+        self.app.register_listener(start_background_scheduler, "main_process_start")
+        self.app.register_listener(stop_background_scheduler, "main_process_stop")
