@@ -5,7 +5,7 @@ from scheduler.Scheduler import schedule_task
 
 class Schedule:
 
-    def __init__(self, uuid: str, task_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None):
+    def __init__(self, uuid: str, task_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None):
         self.uuid = uuid
         self.task_uuid = task_uuid
         self.weeks = weeks
@@ -14,6 +14,8 @@ class Schedule:
         self.minutes = minutes
         self.seconds = seconds
         self.at = at
+        self.times = times
+        self.num_executions = 0
 
     def get_all() -> list:
         schedules = []
@@ -28,18 +30,25 @@ class Schedule:
         Connection.get_connection().json().set(f'schedule:{self.uuid}', Path.rootPath(), self.__to_json__())
 
     def start(self) -> bool:
-        return schedule_task(self.task_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
+        return schedule_task(schedule_uuid=self.uuid, task_uuid=self.task_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
 
     def delete(uuid: str) -> None:
         Connection.get_connection().delete(f'schedule:{uuid}')
 
+    def increment_executions(self):
+        self.num_executions += 1
+        Connection.get_connection().json().set(f'schedule:{self.uuid}', Path.rootPath(), self.__to_json__())
+
     def __to_json__(self) -> json:
         return {
+            "uuid": self.uuid,
             "task_uuid": self.task_uuid,
             "weeks": self.weeks,
             "days": self.days,
             "hours": self.hours,
             "minutes": self.minutes,
             "seconds": self.seconds,
-            "at": self.at
+            "at": self.at,
+            "times": self.times,
+            "num_executions": self.num_executions
         }

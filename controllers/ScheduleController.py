@@ -4,6 +4,7 @@ from sanic.response import HTTPResponse, text, json
 from middleware.Auth import protected
 from models.Schedule import Schedule
 from utils.RequestValidator import RequestValidator
+from models.Task import Task
 import uuid
 
 
@@ -30,34 +31,37 @@ async def create_schedule(request: Request) -> HTTPResponse:
         minutes = request.json.get('minutes')
         seconds = request.json.get('seconds')
         at = request.json.get('at')
+        times = request.json.get('times')
 
-        schedule = Schedule(uuid=str(uuid.uuid4()), task_uuid=task_uuid, \
-                            weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at)
-        if schedule.start():
-            schedule.save()
+        if Task.exists(task_uuid):
 
-            return json({
-                "status" : "success",
-                "message" : "Schedule created successfully",
-                "payload" : {
-                    "task" : schedule.__to_json__()
-                }
-            })
-        else:
+            schedule = Schedule(uuid=str(uuid.uuid4()), task_uuid=task_uuid, \
+                                weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at, times=times)
+            if schedule.start():
+                schedule.save()
+
                 return json({
+                    "status" : "success",
+                    "message" : "Schedule created successfully",
+                    "payload" : {
+                        "task" : schedule.__to_json__()
+                    }
+                })
+        else:
+            return json({
                 "status" : "error",
-                "message" : "Bad request",
-                "payload" : {}},
-                status=400
-            )
+                "message" : "Task not found",
+                "payload" : {
+                    "uuid" : task_uuid
+                }
+            }, status = 404)
 
-    else:
-        return json({
-            "status" : "error",
-            "message" : "Bad request",
-            "payload" : {}},
-            status=400
-        )
+    return json({
+        "status" : "error",
+        "message" : "Bad request",
+        "payload" : {}},
+        status=400
+    )
 
 @schedule_bp.route('/<uuid>', methods=['DELETE'])
 @protected
