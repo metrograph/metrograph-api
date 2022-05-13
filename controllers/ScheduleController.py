@@ -44,7 +44,7 @@ async def create_schedule(request: Request) -> HTTPResponse:
                     "status" : "success",
                     "message" : "Schedule created successfully",
                     "payload" : {
-                        "task" : schedule.__to_json__()
+                        "schedule" : schedule.__to_json__()
                     }
                 })
         else:
@@ -87,6 +87,6 @@ async def delete_schedule(request:Request, uuid:str) -> HTTPResponse:
         "status" : "success",
         "message" : "Schedule deleted successfully",
         "payload" : {
-            "task_uid" : uuid
+            "schedule_uid" : uuid
         }
     })

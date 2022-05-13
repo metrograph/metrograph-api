@@ -23,8 +23,5 @@ class Server:
         self.app.config.connection = Connection.get_connection()
 
     def setup_scheduler(self) -> None:
-        #schedules = Schedule.get_all()
-        # for schedule in schedules:
-            # print(schedule)
         self.app.register_listener(start_background_scheduler, "main_process_start")
         self.app.register_listener(stop_background_scheduler, "main_process_stop")
