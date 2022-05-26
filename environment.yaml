@@ -9,7 +9,7 @@ dependencies:
   - docker==5.0.3
   - sanic==22.3.1
   - aiofiles==0.8.0
-  - metrograph==0.0.1.post1
+  - metrograph==0.0.4
   - redis==4.1.4
   - pickle5==0.0.11
   - Sphinx==4.4.0

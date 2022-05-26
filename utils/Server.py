@@ -8,7 +8,7 @@ class Server:
 
     def __init__(self) -> None:
 
-        self.app = Sanic("metrograph-server", env_prefix='METRO_')
+        self.app = Sanic("metrograph-server", env_prefix='METROGRAPH_')
         self.app.config.update_config("${METRO_CONFIG_FILE}")
 
         self.app.config.compressed_packages_path = self.app.config.COMPRESSED_PACKAGES_PATH

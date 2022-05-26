@@ -1,10 +1,11 @@
 from sanic import Sanic, Blueprint
 from sanic.request import Request
-from sanic.response import HTTPResponse, text, json
+from sanic.response import HTTPResponse, json
 import os
 import uuid
 import aiofiles
 from models.Task import Task
+from models.ActionCode import ActionCode
 from scheduler.Scheduler import schedule_task
 from models.TaskConfig import TaskConfig
 from utils.RequestValidator import RequestValidator
@@ -54,6 +55,25 @@ async def get_task(request: Request, uuid) -> HTTPResponse:
 
 @task_bp.route("/", methods=['POST'])
 @protected
+async def create_action(request: Request) -> HTTPResponse:
+    
+    if not RequestValidator().validate(required_files=[],required_input=['task_name', 'runtime', 'runtime_version'], request=request):
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}},
+            status=400
+        )
+    
+
+    
+    
+    return json({})
+
+    
+'''
+@task_bp.route("/", methods=['POST'])
+@protected
 async def create_task(request: Request) -> HTTPResponse:
 
     if not RequestValidator().validate(required_files=['task_package'],required_input=['task_name', 'runtime', 'runtime_version'], request=request):
@@ -97,7 +117,7 @@ async def create_task(request: Request) -> HTTPResponse:
             "task" : task.__to_json__()
         }
     })
-
+'''
 @task_bp.route("/<uuid>", methods=['DELETE'], ignore_body=False)
 @protected
 async def delete_task(request: Request, uuid) -> HTTPResponse:
