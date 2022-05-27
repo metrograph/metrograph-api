@@ -100,5 +100,11 @@ class ActionCode:
         else:
             return False
 
-    def update_file(action_uuid:str, path: str):
-        pass
+    def update_file(path: str, new_content:str):
+        absolute_path = f'{ActionCode.ACTIONS_PATH+path}'
+        if exists(absolute_path):
+            with open(absolute_path, 'w') as f:
+                f.write(new_content)
+                return True
+        else:
+            return False

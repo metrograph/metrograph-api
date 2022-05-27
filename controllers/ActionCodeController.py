@@ -212,3 +212,28 @@ async def delete_folder(request: Request, uuid) -> HTTPResponse:
             "uuid" : uuid
         }
     })
+
+@actioncode_bp.route("/<uuid>/file", methods=['PUT'])
+@protected
+async def update_file(request: Request, uuid) -> HTTPResponse:
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not ActionCode.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "ActionCode not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+    
+    if ActionCode.update_file(request.json.get('path'), request.json.get('content')):
+        return json({"msg":"ok"})
+    else:
+        return json({"msg":"not found"})
+

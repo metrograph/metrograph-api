@@ -1,6 +1,6 @@
 import json
 from sanic import Sanic
-from metrograph import Action
+from metrograph.Action import Action as m_action
 from db.Connection import Connection
 from redis.commands.json.path import Path
 
@@ -49,6 +49,9 @@ class Action:
 
     def delete(uuid) -> None:
         Connection.get_connection().json().delete(f'action:{uuid}')
+
+    def run() -> None:
+        #m_action()
 
     def to_json(self) -> json:
         return {
