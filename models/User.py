@@ -5,7 +5,6 @@ import uuid
 
 class User:
 
-    #TODO: Create better constructors
     def __init__(self, uuid:str, username:str, password:str, token:str = '') -> None:
         self.uuid=uuid
         self.username = username
@@ -45,7 +44,6 @@ class User:
     def __repr__(self):
         return "User(uuid='{}')".format(self.uuid)
 
-    # "public" method for controllers (no password is added to dict)
     def __to_dict__(self):
         return {"uuid": self.uuid, "username": self.username, "token": self.token}
 

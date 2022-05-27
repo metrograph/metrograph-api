@@ -2,6 +2,7 @@ import json
 from sanic import Sanic
 from metrograph import Action
 from db.Connection import Connection
+from redis.commands.json.path import Path
 import pickle
 
 class Action:
@@ -22,39 +23,40 @@ class Action:
         self.url_enabled = url_enabled
 
     def exists(uuid) -> bool:
-        return Connection.get_connection().get(f'action:{uuid}') != None
+        return Connection.get_connection().json().get(f'action:{uuid}') != None
 
     def is_url_enabled(uuid) -> bool:
         if Action.exists(uuid):
             return Action.get(uuid).url_enabled
         return False
 
-    def run(self) -> None:
-        self.task.run()
-
     def save(self) -> None:
-        Connection.get_connection().set(f'task:{self.uuid}', pickle.dumps(self))
+        Connection.get_connection().json().set(f'action:{self.uuid}', Path.rootPath(), self.to_json())
 
     def get_all() -> list:
-        tasks = []
-        for uuid in Connection.get_connection().scan_iter("task:*"):
-            tasks.append(pickle.loads(Connection.get_connection().get(f'{uuid.decode()}')))
-        return tasks
+        actions = []
+        for uuid in Connection.get_connection().scan_iter("action:*"):
+            actions.append(Action.init_from_dict(Connection.get_connection().json().get(f'{uuid.decode()}')))
+        return actions
+
+    def init_from_dict(action: dict):
+        return Action(uuid=action["uuid"], name=action["name"], description=action["description"], runtime=action["runtime"], runtime_version=action["runtime_version"], url_enabled=action["url_enabled"])
 
     def get(uuid: str):
-        return pickle.loads(Connection.get_connection().get(f'task:{uuid}'))
+        return Action.init_from_dict(Connection.get_connection().json().get(f'action:{uuid}'))
 
     def delete(self) -> None:
-        Connection.get_connection().delete(f'task:{self.uuid}')
+        Connection.get_connection().json().delete(f'action:{self.uuid}')
 
     def delete(uuid) -> None:
-        Connection.get_connection().delete(f'task:{uuid}')
+        Connection.get_connection().json().delete(f'action:{uuid}')
 
-    def __to_json__(self) -> json:
+    def to_json(self) -> json:
         return {
             "uuid": self.uuid,
             "name": self.name,
             "description": self.description,
-            "url_enabled": self.url_enabled,
-            "config": self.config.__to_json__()
+            "runtime": self.runtime,
+            "runtime_version": self.runtime_version,
+            "url_enabled": self.url_enabled
         }
