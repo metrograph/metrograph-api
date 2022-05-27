@@ -23,8 +23,8 @@ async def get_actions(request: Request) -> HTTPResponse:
 
 @action_bp.route("/<uuid>", methods=['GET'])
 @protected
-async def get_action(request: Request, uuid) -> HTTPResponse:
-
+async def get_action(request: Request, uuid:str) -> HTTPResponse:
+    
     if uuid == '':
         return json({
             "status" : "error",
@@ -45,7 +45,7 @@ async def get_action(request: Request, uuid) -> HTTPResponse:
         "status" : "success",
         "message" : "Action retreived successfully",
         "payload" : {
-            "Action" : Action.get(uuid).to_json()
+            "ActionCode" : Action.get(uuid=uuid).to_json()
         }
     })
 
@@ -53,7 +53,6 @@ async def get_action(request: Request, uuid) -> HTTPResponse:
 @protected
 async def create_action(request: Request) -> HTTPResponse:
     if not RequestValidator().validate(required_files=[], required_input=['name', 'description', 'runtime', 'runtime_version'], request=request):
-        
         return json({
             "status" : "error",
             "message" : "Bad request",
@@ -72,6 +71,8 @@ async def create_action(request: Request) -> HTTPResponse:
         url_enabled = request.json.get('url_enabled')
 
     action = Action(uuid=action_uuid, name=name, description=description, runtime=runtime, runtime_version=runtime_version, url_enabled=url_enabled)
+    ActionCode.create_new(uuid=action.uuid, runtime=action.runtime, runtime_version=action.runtime_version)
+    
     action.save()
 
     return json({
@@ -110,7 +111,6 @@ async def delete_action(request: Request, uuid) -> HTTPResponse:
             "action_uid" : uuid
         }
     })
-
 
 @action_bp.route("/<uuid>/run", methods=['POST'])
 @protected

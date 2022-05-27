@@ -3,7 +3,6 @@ from sanic import Sanic
 from metrograph import Action
 from db.Connection import Connection
 from redis.commands.json.path import Path
-import pickle
 
 class Action:
 

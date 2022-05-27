@@ -3,8 +3,8 @@ from models.Files.File import File
 
 class Folder(AbstractFile):
 
-    def __init__(self, uuid, name):
-        super().__init__(uuid, name)
+    def __init__(self, path: str, name: str):
+        super().__init__(path, name)
         self.children = []
 
     def add_child(self, child):
@@ -15,7 +15,6 @@ class Folder(AbstractFile):
 
     def print_tree(tree, level=0):
         print(("\t"*level)+"| ", end='')
-        #print(tree.uuid +' - ', end='')
         print(tree.name)
         
         for element in tree.children:
@@ -23,7 +22,6 @@ class Folder(AbstractFile):
                 Folder.print_tree(element, level=level+1)
             else:
                 print(("\t"*(level+1))+"| ", end='')
-                #print(element.uuid + ' - ', end='')
                 print(element.name)
     
     def get_json_tree(tree):
@@ -33,12 +31,12 @@ class Folder(AbstractFile):
                 json_children.append(Folder.get_json_tree(element))
             else:
                 json_children.append({
-                    'uuid': element.uuid,
+                    'path': element.path,
                     'name': element.name
                 })
         
         return {
-            'uuid': tree.uuid,
+            'path': tree.path,
             'name': tree.name,
             'children': json_children
         }

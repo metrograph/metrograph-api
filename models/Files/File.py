@@ -2,5 +2,5 @@ from models.Files.AbstractFile import AbstractFile
 
 class File(AbstractFile):
 
-    def __init__(self, uuid, name):
-        super().__init__(uuid, name)
+    def __init__(self, path: str, name: str):
+        super().__init__(path, name)
