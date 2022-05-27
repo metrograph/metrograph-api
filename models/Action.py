@@ -52,6 +52,7 @@ class Action:
 
     def run() -> None:
         #m_action()
+        pass
 
     def to_json(self) -> json:
         return {
