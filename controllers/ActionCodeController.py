@@ -1,9 +1,10 @@
 import uu
 from sanic import Sanic, Blueprint
 from sanic.request import Request
-from sanic.response import HTTPResponse, json
+from sanic.response import HTTPResponse, json, file, file_stream
 from models.ActionCode import ActionCode
 from middleware.Auth import protected
+from pathlib import Path
 import uuid
 
 from models.Files.Folder import Folder
@@ -38,6 +39,40 @@ async def get_actioncode(request: Request, uuid) -> HTTPResponse:
             "ActionCode" : ActionCode.get_by_uuid(uuid=uuid).get_json_tree()
         }
     })
+
+@actioncode_bp.route("/<uuid>/file", methods=['GET'])
+@protected
+async def get_file_content(request: Request, uuid) -> HTTPResponse:
+    
+    if uuid == '' or not request.json.get('path'):
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    file_path = ActionCode.ACTIONS_PATH + request.json.get('path')
+
+    if not ActionCode.exists(uuid) or not Path(file_path).exists() or not Path(file_path).is_file():
+        return json({
+            "status" : "error",
+            "message" : "ActionCode not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+
+    if Path(file_path).exists() and Path(file_path).is_file():
+        return await file(file_path)
+    else:
+        return json({
+            "status" : "error",
+            "message" : "File not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+
 
 @actioncode_bp.route("/<uuid>/folder", methods=['POST'])
 @protected
@@ -91,7 +126,7 @@ async def create_file(request: Request, uuid) -> HTTPResponse:
     
     return json({
         "status" : "success",
-        "message" : "Folder created succesfully",
+        "message" : "File created succesfully",
         "payload" : {
             "uuid" : uuid
         }
