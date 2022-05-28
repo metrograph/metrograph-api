@@ -34,13 +34,13 @@ async def get_actioncode(request: Request, uuid) -> HTTPResponse:
 
     return json({
         "status" : "success",
-        "message" : "Action retreived successfully",
+        "message" : "ActionCode retreived successfully",
         "payload" : {
             "ActionCode" : ActionCode.get_by_uuid(uuid=uuid).get_json_tree()
         }
     })
 
-@actioncode_bp.route("/<uuid>/file", methods=['GET'])
+@actioncode_bp.route("/<uuid>/file/content", methods=['POST'])
 @protected
 async def get_file_content(request: Request, uuid) -> HTTPResponse:
     
@@ -51,7 +51,7 @@ async def get_file_content(request: Request, uuid) -> HTTPResponse:
             "payload" : {}
         }, status = 400)
 
-    file_path = ActionCode.ACTIONS_PATH + request.json.get('path')
+    file_path = ActionCode.action_path(uuid) + request.json.get('path')
 
     if not ActionCode.exists(uuid) or not Path(file_path).exists() or not Path(file_path).is_file():
         return json({
@@ -73,7 +73,6 @@ async def get_file_content(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
 
-
 @actioncode_bp.route("/<uuid>/folder", methods=['POST'])
 @protected
 async def create_folder(request: Request, uuid) -> HTTPResponse:
@@ -93,7 +92,7 @@ async def create_folder(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    ActionCode.create_folder(request.json.get('path'))
+    ActionCode.create_folder(uuid, request.json.get('path'))
     
     return json({
         "status" : "success",
@@ -122,7 +121,7 @@ async def create_file(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    ActionCode.create_file(request.json.get('path'))
+    ActionCode.create_file(uuid, request.json.get('path'))
     
     return json({
         "status" : "success",
@@ -151,7 +150,7 @@ async def rename_folder(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    ActionCode.rename_folder(request.json.get('path'), request.json.get('new_name'))
+    ActionCode.rename_folder(uuid, request.json.get('path'), request.json.get('new_name'))
     
     return json({
         "status" : "success",
@@ -180,7 +179,7 @@ async def rename_file(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    ActionCode.rename_file(request.json.get('path'), request.json.get('new_name'))
+    ActionCode.rename_file(uuid, request.json.get('path'), request.json.get('new_name'))
     
     return json({
         "status" : "success",
@@ -209,7 +208,7 @@ async def delete_file(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    ActionCode.delete_file(request.json.get('path'))
+    ActionCode.delete_file(uuid, request.json.get('path'))
     
     return json({
         "status" : "success",
@@ -238,7 +237,7 @@ async def delete_folder(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    ActionCode.delete_folder(request.json.get('path'))
+    ActionCode.delete_folder(uuid, request.json.get('path'))
     
     return json({
         "status" : "success",
@@ -261,14 +260,26 @@ async def update_file(request: Request, uuid) -> HTTPResponse:
     if not ActionCode.exists(uuid):
         return json({
             "status" : "error",
-            "message" : "ActionCode not found",
+            "message" : "File not found",
             "payload" : {
                 "uuid" : uuid
             }
         }, status = 404)
     
-    if ActionCode.update_file(request.json.get('path'), request.json.get('content')):
-        return json({"msg":"ok"})
+    if ActionCode.update_file(uuid, request.json.get('path'), request.json.get('content')):
+        return json({
+            "status" : "success",
+            "message" : "File updated succesfully",
+            "payload" : {
+                "uuid" : uuid
+            }
+        })
     else:
-        return json({"msg":"not found"})
+        return json({
+            "status" : "error",
+            "message" : "File not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
 

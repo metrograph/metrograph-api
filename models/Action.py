@@ -1,6 +1,6 @@
 import json
 from sanic import Sanic
-from metrograph.Action import Action as m_action
+from metrograph.Action import Action as ActionContainer
 from db.Connection import Connection
 from redis.commands.json.path import Path
 
@@ -20,6 +20,8 @@ class Action:
         self.runtime = runtime
         self.runtime_version = runtime_version
         self.url_enabled = url_enabled
+        self.action_container = ActionContainer(self.uuid, self.runtime, self.runtime_version)
+
 
     def exists(uuid) -> bool:
         return Connection.get_connection().json().get(f'action:{uuid}') != None
@@ -50,9 +52,8 @@ class Action:
     def delete(uuid) -> None:
         Connection.get_connection().json().delete(f'action:{uuid}')
 
-    def run() -> None:
-        #m_action()
-        pass
+    def run(self) -> None:
+        self.action_container.run()
 
     def to_json(self) -> json:
         return {

@@ -104,6 +104,8 @@ async def delete_action(request: Request, uuid) -> HTTPResponse:
         }, status = 404)
     
     Action.delete(uuid=uuid)
+    ActionCode.delete(uuid=uuid)
+
     return json({
         "status" : "success",
         "message" : "Action deleted successfully",
@@ -133,7 +135,7 @@ async def run_action(request: Request, uuid) -> HTTPResponse:
         }, status = 404)
     
     action = Action.get(uuid=f'{uuid}')
-    #action.run()
+    action.run()
     return json({
         "status" : "success",
         "message" : "Action started successfully",
