@@ -5,7 +5,6 @@ from sanic.response import HTTPResponse, json, file, file_stream
 from models.ActionCode import ActionCode
 from middleware.Auth import protected
 from pathlib import Path
-import uuid
 
 from models.Files.Folder import Folder
 

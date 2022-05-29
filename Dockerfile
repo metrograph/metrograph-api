@@ -15,6 +15,7 @@ RUN mkdir -p /home/metrograph/actions
 
 # ENV Configuration
 ENV PYTHONDONTWRITEBYTECODE=1
+ENV METROGRAPH_HOME=/home/metrograph
 
 # Pulling latest Action Templates
 RUN git clone https://github.com/metrograph/metrograph-actions-templates.git /home/metrograph/templates
