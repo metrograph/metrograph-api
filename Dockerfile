@@ -7,7 +7,7 @@ COPY requirements.txt ./
 
 # Installing Dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install -i https://test.pypi.org/simple/ metrograph==0.0.4
+RUN pip install -i https://test.pypi.org/simple/ metrograph==0.0.6
 
 # Making Actions folders structure
 RUN mkdir -p /home/metrograph/templates
