@@ -114,6 +114,35 @@ async def delete_action(request: Request, uuid) -> HTTPResponse:
         }
     })
 
+@action_bp.route("/<uuid>/image/build", methods=['POST'])
+@protected
+async def build_action_image(request: Request, uuid) -> HTTPResponse:
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Action.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Action not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+
+    Action.get(uuid).build_image()
+
+    return json({
+        "status" : "success",
+        "message" : "Action image built successfully",
+        "payload" : {
+            "action_uid" : uuid
+        }
+    })
+
 @action_bp.route("/<uuid>/run", methods=['POST'])
 @protected
 async def run_action(request: Request, uuid) -> HTTPResponse:
@@ -136,6 +165,7 @@ async def run_action(request: Request, uuid) -> HTTPResponse:
     
     action = Action.get(uuid=f'{uuid}')
     action.run()
+    
     return json({
         "status" : "success",
         "message" : "Action started successfully",

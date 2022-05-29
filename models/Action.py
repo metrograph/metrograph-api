@@ -22,7 +22,6 @@ class Action:
         self.url_enabled = url_enabled
         self.action_container = ActionContainer(self.uuid, self.runtime, self.runtime_version)
 
-
     def exists(uuid) -> bool:
         return Connection.get_connection().json().get(f'action:{uuid}') != None
 
@@ -51,6 +50,10 @@ class Action:
 
     def delete(uuid) -> None:
         Connection.get_connection().json().delete(f'action:{uuid}')
+
+    def build_image(self) -> None:
+        self.action_container.build_image()
+        return True
 
     def run(self) -> None:
         self.action_container.run()
