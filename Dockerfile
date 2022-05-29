@@ -13,6 +13,9 @@ RUN pip install -i https://test.pypi.org/simple/ metrograph==0.0.6
 RUN mkdir -p /home/metrograph/templates
 RUN mkdir -p /home/metrograph/actions
 
+# ENV Configuration
+ENV PYTHONDONTWRITEBYTECODE=1
+
 # Pulling latest Action Templates
 RUN git clone https://github.com/metrograph/metrograph-actions-templates.git /home/metrograph/templates
 
