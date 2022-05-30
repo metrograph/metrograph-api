@@ -5,6 +5,7 @@ from models.Action import Action
 from models.ActionCode import ActionCode
 from utils.RequestValidator import RequestValidator
 from middleware.Auth import protected
+import metrograph
 import uuid
 
 app = Sanic.get_app()
@@ -163,14 +164,62 @@ async def run_action(request: Request, uuid) -> HTTPResponse:
             }
         }, status = 404)
     
-    action = Action.get(uuid=f'{uuid}')
-    action.run()
+    try:
+
+        action = Action.get(uuid=f'{uuid}')
+        action.run()
+
+        return json({
+            "status" : "success",
+            "message" : "Action started successfully",
+            "payload" : {
+                "action_uid" : action.uuid
+            }
+        })
+
+    except metrograph.errors.ImageNotFound as e:
+        return json({
+                "status" : "error",
+                "message" : "Failed to run the action",
+                "payload" : {
+                    "action_uuid": action.uuid,
+                    "error_type" : "image_not_found",
+                    "error_message": f'{e}'
+                }
+            }, status=500)
+
+    except metrograph.errors.APIError as e:
+        return json({
+                "status" : "error",
+                "message" : "Failed to run the action",
+                "payload" : {
+                    "action_uuid": action.uuid,
+                    "error_type" : "api_error",
+                    "error_message": f'{e}'
+                }
+            }, status=500)
+
+    except metrograph.errors.ContainerError as e:
+        return json({
+                "status" : "error",
+                "message" : "Failed to run the action",
+                "payload" : {
+                    "action_uuid": action.uuid,
+                    "error_type" : "container_error",
+                    "error_message": f'{e}'
+                }
+            }, status=500)
+
+    except Exception as e:
+        return json({
+                "status" : "error",
+                "message" : "Failed to run the action",
+                "payload" : {
+                    "action_uuid": action.uuid,
+                    "error_type" : "other_error",
+                    "error_message": f'{e}'
+                }
+            }, status=500)
     
-    return json({
-        "status" : "success",
-        "message" : "Action started successfully",
-        "payload" : {
-            "action_uid" : action.uuid
-        }
-    })
+    
 
