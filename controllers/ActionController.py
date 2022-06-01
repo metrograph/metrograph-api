@@ -104,6 +104,53 @@ async def create_action(request: Request) -> HTTPResponse:
                 }
             })
 
+@action_bp.route("/<uuid>", methods=['PATCH'])
+@protected
+async def edit_action(request: Request, uuid:str) -> HTTPResponse:
+
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Action.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Action not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+    
+    action = Action.get(uuid=uuid)
+
+    if request.json.get('name'):
+        action.name = request.json.get('name')
+
+    if request.json.get('description'):
+        action.description = request.json.get('description')
+
+    if request.json.get('runtime'):
+        action.runtime = request.json.get('runtime')
+
+    if request.json.get('runtime_version'):
+        action.runtime_version = request.json.get('runtime_version')
+
+    if request.json.get('url_enabled'):
+        action.url_enabled = request.json.get('url_enabled')
+
+    action.save()
+
+    return json({
+                "status" : "success",
+                "message" : "Action updated successfully",
+                "payload" : {
+                    "action" : action.to_json()
+                }
+            })
+
 @action_bp.route("/<uuid>", methods=['DELETE'], ignore_body=False)
 @protected
 async def delete_action(request: Request, uuid) -> HTTPResponse:

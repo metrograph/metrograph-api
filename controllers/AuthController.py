@@ -40,6 +40,8 @@ async def register(request: Request) -> HTTPResponse:
         }
     })
 
+# TODO: update password
+
 @auth_bp.route("/", methods=['POST'])
 async def authentificate(request: Request) -> HTTPResponse:
 
