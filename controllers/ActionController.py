@@ -14,13 +14,23 @@ action_bp = Blueprint('action', url_prefix='action', version=1)
 @action_bp.route("/", methods=['GET'])
 @protected
 async def get_actions(request: Request) -> HTTPResponse:
-    return json({
-        "status" : "success",
-        "message" : "Actions retreived successfully",
-        "payload" : {
-            "actions" : [a.to_json() for a in Action.get_all()]
-        }
-    })
+    try:
+        return json({
+            "status" : "success",
+            "message" : "Actions retreived successfully",
+            "payload" : {
+                "actions" : [a.to_json() for a in Action.get_all()]
+            }
+        })
+    except Exception as e:
+        return json({
+                "status" : "error",
+                "message" : "Failed to retreive actions",
+                "payload" : {
+                    "error_type" : "database_error",
+                    "error_message": f'{e}'
+                }
+            }, status=500)
 
 @action_bp.route("/<uuid>", methods=['GET'])
 @protected
@@ -42,13 +52,23 @@ async def get_action(request: Request, uuid:str) -> HTTPResponse:
             }
         }, status = 404)
 
-    return json({
-        "status" : "success",
-        "message" : "Action retreived successfully",
-        "payload" : {
-            "ActionCode" : Action.get(uuid=uuid).to_json()
-        }
-    })
+    try:
+        return json({
+            "status" : "success",
+            "message" : "Action retreived successfully",
+            "payload" : {
+                "ActionCode" : Action.get(uuid=uuid).to_json()
+            }
+        })
+    except Exception as e:
+        return json({
+                "status" : "error",
+                "message" : "Failed to retreive action",
+                "payload" : {
+                    "error_type" : "database_error",
+                    "error_message": f'{e}'
+                }
+            }, status=500)
 
 @action_bp.route("/", methods=['POST'])
 @protected

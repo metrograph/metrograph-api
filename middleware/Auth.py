@@ -1,8 +1,8 @@
 from functools import wraps
-from urllib import response
 from models.User import User
 from sanic import Request, json
 import jwt
+import redis
 
 def is_authentificated(request: Request) -> bool:
     if not request.token:
@@ -26,16 +26,25 @@ def protected(wrapped):
     def decorator(f):
         @wraps(f)
         async def decorated_function(request, *args, **kwargs):
-            if is_authentificated(request=request):
-                response = await f(request, *args, **kwargs)
-                return response
-            else:
+            try:
+                if is_authentificated(request=request):
+                    response = await f(request, *args, **kwargs)
+                    return response
+                else:
+                    return json({
+                        "status" : "error",
+                        "message" : "Unauthorized",
+                        "payload" : {}
+                    }, status = 401)
+            except Exception as e:
                 return json({
                     "status" : "error",
-                    "message" : "Unauthorized",
-                    "payload" : {}
-                }, status = 401)
-        
+                    "message" : "Database error",
+                    "payload" : {
+                        "error_type" : "database_error",
+                        "error_message": f'{e}'
+                    }
+                }, status = 500)
         return decorated_function
     return decorator(wrapped)
 

@@ -6,7 +6,7 @@ class Connection:
                         host='redis-18213.c293.eu-central-1-1.ec2.cloud.redislabs.com',
                         port=18213,
                         db=0,
-                        password='2e5Ciyhe7p1TKgt95uP2emHQpybXIfiz'
+                        password='5cpLGOIzKs6QhIy3D3C4ubUXCmQrkePe'
                     )
 
     def __init__(self) -> None:
