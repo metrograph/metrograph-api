@@ -40,7 +40,6 @@ async def register(request: Request) -> HTTPResponse:
         }
     })
 
-# TODO: update password
 @auth_bp.route("/account", methods=['PATCH'])
 async def update_passwword(request: Request) -> HTTPResponse:
     

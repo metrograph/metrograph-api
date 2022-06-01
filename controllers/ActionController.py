@@ -94,15 +94,26 @@ async def create_action(request: Request) -> HTTPResponse:
     action = Action(uuid=action_uuid, name=name, description=description, runtime=runtime, runtime_version=runtime_version, url_enabled=url_enabled)
     ActionCode.create_new(uuid=action.uuid, runtime=action.runtime, runtime_version=action.runtime_version)
     
-    action.save()
+    try:
+        action.build_image()
+        action.save()
+        return json({
+                    "status" : "success",
+                    "message" : "Action created successfully",
+                    "payload" : {
+                        "action" : action.to_json()
+                    }
+                })
+    except Exception as e:
+        return json({
+                    "status" : "error",
+                    "message" : "Action creation error",
+                    "payload" : {
+                        "error_type" : "action_error",
+                        "error_message": f'{e}'
+                    }
+                }, status = 500)
 
-    return json({
-                "status" : "success",
-                "message" : "Action created successfully",
-                "payload" : {
-                    "action" : action.to_json()
-                }
-            })
 
 @action_bp.route("/<uuid>", methods=['PATCH'])
 @protected

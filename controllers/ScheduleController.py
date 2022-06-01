@@ -4,7 +4,7 @@ from sanic.response import HTTPResponse, text, json
 from middleware.Auth import protected
 from models.Schedule import Schedule
 from utils.RequestValidator import RequestValidator
-from models.Task import Task
+from models.Action import Action
 import uuid
 
 
@@ -15,16 +15,20 @@ schedule_bp = Blueprint('schedule', 'schedule', version=1)
 @protected
 async def get_schedules(request: Request) -> HTTPResponse:
     return json({
-        "message": Schedule.get_all()
-    })
+                    "status" : "success",
+                    "message" : "Schedules retrieved successfully",
+                    "payload" : {
+                        "schedules" : Schedule.get_all()
+                    }
+                })
 
 @schedule_bp.route('/', methods=['POST'])
 @protected
 async def create_schedule(request: Request) -> HTTPResponse:
     
-    if RequestValidator().validate(request=request, required_input=['task_uuid'], required_files=[]):
+    if RequestValidator().validate(request=request, required_input=['action_uuid'], required_files=[]):
         
-        task_uuid = request.json.get('task_uuid')
+        action_uuid = request.json.get('action_uuid')
         weeks = request.json.get('weeks')
         days = request.json.get('days')
         hours = request.json.get('hours')
@@ -33,9 +37,9 @@ async def create_schedule(request: Request) -> HTTPResponse:
         at = request.json.get('at')
         times = request.json.get('times')
 
-        if Task.exists(task_uuid):
+        if Action.exists(action_uuid):
 
-            schedule = Schedule(uuid=str(uuid.uuid4()), task_uuid=task_uuid, \
+            schedule = Schedule(uuid=str(uuid.uuid4()), action_uuid=action_uuid, \
                                 weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at, times=times)
             if schedule.start():
                 schedule.save()
@@ -50,9 +54,9 @@ async def create_schedule(request: Request) -> HTTPResponse:
         else:
             return json({
                 "status" : "error",
-                "message" : "Task not found",
+                "message" : "Action not found",
                 "payload" : {
-                    "uuid" : task_uuid
+                    "uuid" : action_uuid
                 }
             }, status = 404)
 

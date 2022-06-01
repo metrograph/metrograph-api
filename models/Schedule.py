@@ -1,13 +1,13 @@
 from db.Connection import Connection
 from sanic.response import json
 from redis.commands.json.path import Path
-from scheduler.Scheduler import schedule_task
+from scheduler.Scheduler import schedule_action
 
 class Schedule:
 
-    def __init__(self, uuid: str, task_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None):
+    def __init__(self, uuid: str, action_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None):
         self.uuid = uuid
-        self.task_uuid = task_uuid
+        self.action_uuid = action_uuid
         self.weeks = weeks
         self.days = days
         self.hours = hours
@@ -30,7 +30,7 @@ class Schedule:
         Connection.get_connection().json().set(f'schedule:{self.uuid}', Path.rootPath(), self.__to_json__())
 
     def start(self) -> bool:
-        return schedule_task(schedule_uuid=self.uuid, task_uuid=self.task_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
+        return schedule_action(schedule_uuid=self.uuid, action_uuid=self.action_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
 
     def delete(uuid: str) -> None:
         Connection.get_connection().delete(f'schedule:{uuid}')
@@ -42,7 +42,7 @@ class Schedule:
     def __to_json__(self) -> json:
         return {
             "uuid": self.uuid,
-            "task_uuid": self.task_uuid,
+            "action_uuid": self.action_uuid,
             "weeks": self.weeks,
             "days": self.days,
             "hours": self.hours,
