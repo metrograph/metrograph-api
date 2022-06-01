@@ -41,10 +41,46 @@ async def register(request: Request) -> HTTPResponse:
     })
 
 # TODO: update password
+@auth_bp.route("/account", methods=['PATCH'])
+async def update_passwword(request: Request) -> HTTPResponse:
+    
+    validator = RequestValidator()
+    if not validator.validate(request=request, required_files=[], required_input=['username', 'password', 'new_password']):
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+    
+    if not User.exists(username=request.json['username']):
+        return json({
+            "status" : "error",
+            "message" : "Unauthorized",
+            "payload" : {}
+        }, status = 401)
+    
+    user = User.get_by_username(username=request.json['username'])
+
+    if not bcrypt.checkpw(str.encode(request.json['password']), str.encode(user.password)):
+        return json({
+            "status" : "error",
+            "message" : "Unauthorized",
+            "payload" : {}
+        }, status = 401)
+    
+    user.password = bcrypt.hashpw(str.encode(request.json.get('new_password')), bcrypt.gensalt()).decode()
+    user.save()
+
+    return json({
+        "status" : "success",
+        "message" : "User authentificated successfully",
+        "payload" : {
+            "user" : user.__to_dict__()
+        }
+    })
 
 @auth_bp.route("/", methods=['POST'])
 async def authentificate(request: Request) -> HTTPResponse:
-
     validator = RequestValidator()
     if not validator.validate(request=request, required_files=[], required_input=['username', 'password']):
         return json({
