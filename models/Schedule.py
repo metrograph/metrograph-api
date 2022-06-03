@@ -1,7 +1,7 @@
 from db.Connection import Connection
 from sanic.response import json
 from redis.commands.json.path import Path
-from scheduler.Scheduler import schedule_action
+from scheduler.Scheduler import schedule_action, restart_background_scheduler
 
 class Schedule:
 
@@ -29,8 +29,9 @@ class Schedule:
     def save(self) -> None:
         Connection.get_connection().json().set(f'schedule:{self.uuid}', Path.rootPath(), self.__to_json__())
 
-    def start(self) -> bool:
-        return schedule_action(schedule_uuid=self.uuid, action_uuid=self.action_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
+    async def start(self, app) -> bool:
+        #return schedule_action(schedule_uuid=self.uuid, action_uuid=self.action_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
+        await restart_background_scheduler(app)
 
     def delete(uuid: str) -> None:
         Connection.get_connection().delete(f'schedule:{uuid}')

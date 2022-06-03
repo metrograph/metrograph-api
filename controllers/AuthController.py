@@ -72,7 +72,7 @@ async def update_passwword(request: Request) -> HTTPResponse:
 
     return json({
         "status" : "success",
-        "message" : "User authentificated successfully",
+        "message" : "Password updated successfully",
         "payload" : {
             "user" : user.__to_dict__()
         }

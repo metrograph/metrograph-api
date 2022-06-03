@@ -41,6 +41,8 @@ def run_action(schedule_uuid:str, action_uuid: str):
             if sc["num_executions"] == sc["times"]:
                 print("Reached maximum executions, quitting..")
                 return schedule.CancelJob
+            else:
+                print(f"Action {action_uuid} ran {sc['num_executions']} out of {sc['times']}")
         else:
             schedule.CancelJob
     else:
@@ -129,3 +131,7 @@ async def stop_background_scheduler(app):
     print("############## stopping main schedule thread")
     scheduler_thread = app.ctx.scheduler_thread
     scheduler_thread.set()
+
+async def restart_background_scheduler(app):
+    await stop_background_scheduler(app)
+    await start_background_scheduler(app)

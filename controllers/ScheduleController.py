@@ -41,16 +41,17 @@ async def create_schedule(request: Request) -> HTTPResponse:
 
             schedule = Schedule(uuid=str(uuid.uuid4()), action_uuid=action_uuid, \
                                 weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at, times=times)
-            if schedule.start():
-                schedule.save()
+            schedule.save()
+            #await schedule.start(app)
 
-                return json({
-                    "status" : "success",
-                    "message" : "Schedule created successfully",
-                    "payload" : {
-                        "schedule" : schedule.__to_json__()
-                    }
-                })
+
+            return json({
+                "status" : "success",
+                "message" : "Schedule created successfully",
+                "payload" : {
+                    "schedule" : schedule.__to_json__()
+                }
+            })
         else:
             return json({
                 "status" : "error",
