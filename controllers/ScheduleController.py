@@ -44,7 +44,6 @@ async def create_schedule(request: Request) -> HTTPResponse:
             schedule.save()
             #await schedule.start(app)
 
-
             return json({
                 "status" : "success",
                 "message" : "Schedule created successfully",
