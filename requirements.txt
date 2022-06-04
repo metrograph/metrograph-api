@@ -1,5 +1,5 @@
 docker==5.0.3
-sanic==21.12.1
+sanic==22.3.1
 aiofiles==0.8.0
 redis==4.1.4
 pyjwt==2.3.0

@@ -21,4 +21,4 @@ app.blueprint(actioncode_bp)
 app.blueprint(schedule_bp)
 #app.blueprint(api_bp)
 
-app.run(host='0.0.0.0', port=1337, access_log=False, fast=True, auto_reload=True)
+app.run(host='0.0.0.0', port=1337, access_log=True, fast=True, auto_reload=True)
