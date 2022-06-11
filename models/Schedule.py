@@ -24,7 +24,7 @@ class Schedule:
         return schedules
 
     def exists(uuid) -> bool:
-        return Connection.get_connection().get(f'schedule:{uuid}') != None
+        return Connection.get_connection().json().get(f'schedule:{uuid}') != None
 
     def save(self) -> None:
         Connection.get_connection().json().set(f'schedule:{self.uuid}', Path.rootPath(), self.__to_json__())
@@ -34,7 +34,7 @@ class Schedule:
         await restart_background_scheduler(app)
 
     def delete(uuid: str) -> None:
-        Connection.get_connection().delete(f'schedule:{uuid}')
+        Connection.get_connection().json().delete(f'schedule:{uuid}')
 
     def increment_executions(self):
         self.num_executions += 1
