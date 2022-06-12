@@ -1,3 +1,4 @@
+from sanic import json
 from db.Connection import Connection
 import threading
 import time
@@ -6,7 +7,15 @@ import re
 from models.Action import Action
 from redis.commands.json.path import Path
 
-def run_continuously(interval=1):
+def process_schedule(interval=5):
+    while True:
+        schedule.run_pending()
+        time.sleep(interval)
+
+def create_schedule_thread():
+    schedule_thread = threading.Thread(target=process_schedule, args=())
+
+def run_continuously(interval=5):
     
     cease_continuous_run = threading.Event()
     class ScheduleThread(threading.Thread):
@@ -34,17 +43,27 @@ def increment_schedule_execution(schedule_uuid:str):
 def run_action(schedule_uuid:str, action_uuid: str):
     if schedule_exists(schedule_uuid=schedule_uuid) and Action.exists(uuid=action_uuid):
         sc = get_schedule(schedule_uuid=schedule_uuid)
-        if sc["num_executions"] < sc["times"]:
-            Action.get(uuid=action_uuid).run()
-            increment_schedule_execution(schedule_uuid=schedule_uuid)
-            sc = get_schedule(schedule_uuid=schedule_uuid)
-            if sc["num_executions"] == sc["times"]:
-                print("Reached maximum executions, quitting..")
-                return schedule.CancelJob
+        print(sc)
+        if sc["times"] > 0:
+            if sc["num_executions"] < sc["times"] and sc["enabled"]:
+                Action.get(uuid=action_uuid).run()
+                increment_schedule_execution(schedule_uuid=schedule_uuid)
+                sc = get_schedule(schedule_uuid=schedule_uuid)
+                if sc["num_executions"] == sc["times"]:
+                    print("Reached maximum executions, quitting..")
+                    return schedule.CancelJob
+                else:
+                    print(f"Action {action_uuid} ran {sc['num_executions']} out of {sc['times']}")
             else:
-                print(f"Action {action_uuid} ran {sc['num_executions']} out of {sc['times']}")
+                schedule.CancelJob
         else:
-            schedule.CancelJob
+            if sc["enabled"]:
+                Action.get(uuid=action_uuid).run()
+                increment_schedule_execution(schedule_uuid=schedule_uuid)
+                sc = get_schedule(schedule_uuid=schedule_uuid)
+                print(f"Action {action_uuid} ran {sc['num_executions']} out of unlimited")
+            else:
+                schedule.CancelJob
     else:
         print("Action or schedule non existing, quitting..")
         return schedule.CancelJob
@@ -114,7 +133,9 @@ def schedule_action(schedule_uuid:str, action_uuid: str, weeks=None, days=None, 
 def get_active_schedules():
     schedules = []
     for uuid in Connection.get_connection().scan_iter('schedule:*'):
-        schedules.append(Connection.get_connection().json().get(f'{uuid.decode()}'))
+        sc = Connection.get_connection().json().get(f'{uuid.decode()}')
+        if sc["enabled"] and (sc["times"] < 0 or sc["num_executions"] < sc["times"]):
+            schedules.append(sc)
     return schedules
 
 async def start_background_scheduler(app):
@@ -130,7 +151,9 @@ async def start_background_scheduler(app):
 async def stop_background_scheduler(app):
     print("############## stopping main schedule thread")
     scheduler_thread = app.ctx.scheduler_thread
+    print(scheduler_thread)
     scheduler_thread.set()
+    print(scheduler_thread)
 
 async def restart_background_scheduler(app):
     await stop_background_scheduler(app)

@@ -7,7 +7,6 @@ from utils.RequestValidator import RequestValidator
 from models.Action import Action
 import uuid
 
-
 app = Sanic.get_app()
 schedule_bp = Blueprint('schedule', 'schedule', version=1)
 
@@ -36,13 +35,15 @@ async def create_schedule(request: Request) -> HTTPResponse:
         seconds = request.json.get('seconds')
         at = request.json.get('at')
         times = request.json.get('times')
+        enabled = request.json.get('enabled')
 
         if Action.exists(action_uuid):
 
             schedule = Schedule(uuid=str(uuid.uuid4()), action_uuid=action_uuid, \
-                                weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at, times=times)
+                                weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at, times=times, enabled=enabled)
             schedule.save()
-            #await schedule.start(app)
+            
+            await schedule.start(app)
 
             return json({
                 "status" : "success",
@@ -94,3 +95,13 @@ async def delete_schedule(request:Request, uuid:str) -> HTTPResponse:
             "schedule_uid" : uuid
         }
     })
+
+@schedule_bp.route('/<uuid>/enable', methods=['POST'])
+@protected
+async def enable_schedule(request:Request, uuid:str) -> HTTPResponse:
+    return json({})
+
+@schedule_bp.route('/<uuid>/disable', methods=['POST'])
+@protected
+async def disable_schedule(request:Request, uuid:str) -> HTTPResponse:
+    return json({})

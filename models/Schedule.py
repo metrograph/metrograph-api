@@ -5,7 +5,7 @@ from scheduler.Scheduler import schedule_action, restart_background_scheduler
 
 class Schedule:
 
-    def __init__(self, uuid: str, action_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None):
+    def __init__(self, uuid: str, action_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None, enabled=True):
         self.uuid = uuid
         self.action_uuid = action_uuid
         self.weeks = weeks
@@ -14,8 +14,11 @@ class Schedule:
         self.minutes = minutes
         self.seconds = seconds
         self.at = at
-        self.times = times
+        self.times = -1
+        if times:
+            self.times = times
         self.num_executions = 0
+        self.enabled = enabled
 
     def get_all() -> list:
         schedules = []
@@ -51,5 +54,6 @@ class Schedule:
             "seconds": self.seconds,
             "at": self.at,
             "times": self.times,
-            "num_executions": self.num_executions
+            "num_executions": self.num_executions,
+            "enabled": self.enabled
         }
