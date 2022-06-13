@@ -13,8 +13,6 @@ def run_continuously(interval=1):
         @classmethod
         def run(self):
             while not cease_continuous_run.is_set():
-                #sc_number = reload_active_schedules()
-                #logger.info(f"Reloading schedules... {sc_number} found!")
                 logger.info(f"Scheduler Jobs count:... {len(schedule.get_jobs())}")
                 schedule.run_pending()
                 time.sleep(interval)
@@ -30,7 +28,7 @@ def start_scheduler_reload_thread(interval=1):
         def run(self):
             while not cease_scheduler_reload_thread.is_set():
                 sc_number = reload_active_schedules()
-                logger.info(f"{self.name} Reloading schedules... {sc_number} found!")
+                logger.info(f"Reloading schedules... {sc_number} found!")
                 time.sleep(interval)
 
     scheduler_reload_thread = ScheduleReloaderThread()
@@ -87,54 +85,54 @@ def schedule_action(schedule_uuid:str, action_uuid: str, weeks=None, days=None, 
             pattern = re.compile("^[0-1][0-9]:[0-5][0-9]:[0-5][0-9]$|^[2][0-3]:[0-5][0-9]:[0-5][0-9]$")
             if pattern.match(day_time):
                 if week_day == "monday":
-                    schedule.every(weeks).monday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).monday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 elif week_day == "tuesday":
-                    schedule.every(weeks).tuesday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).tuesday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 elif week_day == "wednesday":
-                    schedule.every(weeks).wednesday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).wednesday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 elif week_day == "thursday":
-                    schedule.every(weeks).thursday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).thursday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 elif week_day == "friday":
-                    schedule.every(weeks).friday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).friday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 elif week_day == "saturday":
-                    schedule.every(weeks).saturday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).saturday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 elif week_day == "sunday":
-                    schedule.every(weeks).sunday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                    schedule.every(weeks).sunday.at(day_time).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
                 else:
                     return False
             else:
                 return False
         else:
-            schedule.every(weeks).weeks.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+            schedule.every(weeks).weeks.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
     elif days:
         if at:
             pattern = re.compile("^[0-1][0-9]:[0-5][0-9]:[0-5][0-9]$|^[2][0-3]:[0-5][0-9]:[0-5][0-9]$")
             if pattern.match(at):
-                schedule.every(days).days.at(at).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                schedule.every(days).days.at(at).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
             else:
                 return False
         else:
-            schedule.every(days).days.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+            schedule.every(days).days.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
     elif hours:
         if at:
             pattern = re.compile("^[0-5][0-9]:[0-5][0-9]$")
             if pattern.match(at):
-                schedule.every(hours).hours.at(at).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                schedule.every(hours).hours.at(at).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
             else:
                 return False
         else:
-            schedule.every(hours).hours.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+            schedule.every(hours).hours.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
     elif minutes:
         if at:
             pattern = re.compile("^:[0-5][0-9]$")
             if pattern.match(at):
-                schedule.every(minutes).minutes.at(at).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+                schedule.every(minutes).minutes.at(at).do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
             else:
                 return False
         else:
-            schedule.every(minutes).minutes.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+            schedule.every(minutes).minutes.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
     elif seconds:
-        schedule.every(seconds).seconds.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid)
+        schedule.every(seconds).seconds.do(run_action, schedule_uuid=schedule_uuid, action_uuid=action_uuid).tag(schedule_uuid)
 
     return True
 
@@ -146,7 +144,27 @@ def get_active_schedules():
             schedules.append(sc)
     return schedules
 
+def get_inactive_schedules():
+    schedules = []
+    for uuid in Connection.get_connection().scan_iter('schedule:*'):
+        sc = Connection.get_connection().json().get(f'{uuid.decode()}')
+        if not sc["enabled"] or sc["num_executions"] >= sc["times"]:
+            schedules.append(sc)
+    return schedules
+
 def reload_active_schedules():
+
+    # Cancelling newly disabled schedules
+    scs = get_inactive_schedules()
+    for sc in scs:
+        if sc["loaded"]:
+            schedule.clear(sc["uuid"])
+            logger.info(f'Cleader Schedule : {sc["uuid"]}')
+            sc["loaded"] = False
+            Connection.get_connection().json().set(f'schedule:{sc["uuid"]}', Path.rootPath(), sc)
+            logger.info(f'Updated Schedule state to UNLOADED : {sc["uuid"]}')
+
+    # Starting newly disabled schedules
     scs = get_active_schedules()
     active_count = 0
     for sc in scs:

@@ -149,7 +149,7 @@ async def disable_schedule(request:Request, uuid:str) -> HTTPResponse:
 
     return json({
                 "status" : "success",
-                "message" : "Schedule enabled successfully",
+                "message" : "Schedule disabled successfully",
                 "payload" : {
                     "schedule" : schedule.__to_json__()
                 }

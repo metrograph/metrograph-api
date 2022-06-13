@@ -4,7 +4,7 @@ from redis.commands.json.path import Path
 
 class Schedule:
 
-    def __init__(self, uuid: str, action_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None, enabled=True):
+    def __init__(self, uuid: str, action_uuid: str, weeks=None, days=None, hours=None, minutes=None, seconds=None, at=None, times=None, num_executions=0, enabled=True, loaded=False):
         self.uuid = uuid
         self.action_uuid = action_uuid
         self.weeks = weeks
@@ -16,9 +16,9 @@ class Schedule:
         self.times = -1
         if times:
             self.times = times
-        self.num_executions = 0
+        self.num_executions = num_executions
         self.enabled = enabled
-        self.loaded = False
+        self.loaded = loaded
 
     def get_all() -> list:
         schedules = []
@@ -27,7 +27,11 @@ class Schedule:
         return schedules
 
     def get_by_uuid(uuid) -> bool:
-        return Connection.get_connection().json().get(f'schedule:{uuid}')
+        return Schedule.init_from_dict(Connection.get_connection().json().get(f'schedule:{uuid}'))
+
+    def init_from_dict(sc: dict):
+        schedule = Schedule(sc["uuid"], sc["action_uuid"], sc["weeks"], sc["days"], sc["hours"], sc["minutes"], sc["seconds"], sc["at"], sc["times"], sc["num_executions"], sc["enabled"], sc["loaded"])
+        return schedule
 
     def exists(uuid) -> bool:
         return Connection.get_connection().json().get(f'schedule:{uuid}') != None
