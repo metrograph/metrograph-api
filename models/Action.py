@@ -56,7 +56,10 @@ class Action:
         return True
 
     def run(self) -> None:
-        self.action_container.run()
+        try:
+            self.action_container.run()
+        except Exception as e:
+            pass
 
     def to_json(self) -> json:
         return {
