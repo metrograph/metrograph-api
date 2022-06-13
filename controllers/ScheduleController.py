@@ -1,3 +1,4 @@
+import uu
 from sanic import Sanic, Blueprint
 from sanic.request import Request
 from sanic.response import HTTPResponse, text, json
@@ -42,8 +43,6 @@ async def create_schedule(request: Request) -> HTTPResponse:
             schedule = Schedule(uuid=str(uuid.uuid4()), action_uuid=action_uuid, \
                                 weeks=weeks, days=days, hours=hours, minutes=minutes, seconds=seconds, at=at, times=times, enabled=enabled)
             schedule.save()
-            
-            await schedule.start(app)
 
             return json({
                 "status" : "success",
@@ -88,6 +87,7 @@ async def delete_schedule(request:Request, uuid:str) -> HTTPResponse:
         }, status = 404)
     
     Schedule.delete(uuid=uuid)
+
     return json({
         "status" : "success",
         "message" : "Schedule deleted successfully",
@@ -99,9 +99,59 @@ async def delete_schedule(request:Request, uuid:str) -> HTTPResponse:
 @schedule_bp.route('/<uuid>/enable', methods=['POST'])
 @protected
 async def enable_schedule(request:Request, uuid:str) -> HTTPResponse:
-    return json({})
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Schedule.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Schedule not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+    schedule = Schedule.get_by_uuid(uuid=uuid)
+    schedule.enabled = True
+    schedule.save()
+
+    return json({
+                "status" : "success",
+                "message" : "Schedule enabled successfully",
+                "payload" : {
+                    "schedule" : schedule.__to_json__()
+                }
+            })
 
 @schedule_bp.route('/<uuid>/disable', methods=['POST'])
 @protected
 async def disable_schedule(request:Request, uuid:str) -> HTTPResponse:
-    return json({})
+    if uuid == '':
+        return json({
+            "status" : "error",
+            "message" : "Bad request",
+            "payload" : {}
+        }, status = 400)
+
+    if not Schedule.exists(uuid):
+        return json({
+            "status" : "error",
+            "message" : "Schedule not found",
+            "payload" : {
+                "uuid" : uuid
+            }
+        }, status = 404)
+    schedule = Schedule.get_by_uuid(uuid=uuid)
+    schedule.enabled = False
+    schedule.save()
+
+    return json({
+                "status" : "success",
+                "message" : "Schedule enabled successfully",
+                "payload" : {
+                    "schedule" : schedule.__to_json__()
+                }
+            })

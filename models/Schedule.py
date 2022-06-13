@@ -1,7 +1,6 @@
 from db.Connection import Connection
 from sanic.response import json
 from redis.commands.json.path import Path
-from scheduler.Scheduler import schedule_action, restart_background_scheduler
 
 class Schedule:
 
@@ -19,6 +18,7 @@ class Schedule:
             self.times = times
         self.num_executions = 0
         self.enabled = enabled
+        self.loaded = False
 
     def get_all() -> list:
         schedules = []
@@ -26,15 +26,14 @@ class Schedule:
             schedules.append(Connection.get_connection().json().get(f'{uuid.decode()}'))
         return schedules
 
+    def get_by_uuid(uuid) -> bool:
+        return Connection.get_connection().json().get(f'schedule:{uuid}')
+
     def exists(uuid) -> bool:
         return Connection.get_connection().json().get(f'schedule:{uuid}') != None
 
     def save(self) -> None:
         Connection.get_connection().json().set(f'schedule:{self.uuid}', Path.rootPath(), self.__to_json__())
-
-    async def start(self, app) -> bool:
-        #return schedule_action(schedule_uuid=self.uuid, action_uuid=self.action_uuid, weeks=self.weeks, days=self.days, hours=self.hours, minutes=self.minutes, seconds=self.seconds, at=self.at)
-        await restart_background_scheduler(app)
 
     def delete(uuid: str) -> None:
         Connection.get_connection().json().delete(f'schedule:{uuid}')
@@ -55,5 +54,6 @@ class Schedule:
             "at": self.at,
             "times": self.times,
             "num_executions": self.num_executions,
-            "enabled": self.enabled
+            "enabled": self.enabled,
+            "loaded": self.loaded
         }
