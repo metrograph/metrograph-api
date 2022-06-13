@@ -1,4 +1,3 @@
-from sanic import Sanic, json
 from sanic.log import logger
 from db.Connection import Connection
 import threading
@@ -7,7 +6,6 @@ import schedule
 import re
 from models.Action import Action
 from redis.commands.json.path import Path
-from datetime import datetime
 
 def run_continuously(interval=1):
     cease_continuous_run = threading.Event()
@@ -23,7 +21,6 @@ def run_continuously(interval=1):
 
     scheduler_thread = ScheduleThread()
     scheduler_thread.start()
-
     return cease_continuous_run
 
 def start_scheduler_reload_thread(interval=1):
@@ -72,11 +69,11 @@ def run_action(schedule_uuid:str, action_uuid: str):
                 Action.get(uuid=action_uuid).run()
                 increment_schedule_execution(schedule_uuid=schedule_uuid)
                 sc = get_schedule(schedule_uuid=schedule_uuid)
-                print(f"Action {action_uuid} ran {sc['num_executions']} out of unlimited")
+                logger.info(f"Action {action_uuid} ran {sc['num_executions']} out of unlimited")
             else:
                 return schedule.CancelJob
     else:
-        print("Action or schedule non existing, quitting..")
+        logger.info(f"Action {action_uuid} or schedule {schedule_uuid} non existing, quitting..")
         return schedule.CancelJob
 
 def stop_action(schedule_uuid: str):
@@ -177,15 +174,13 @@ async def start_background_scheduler(app):
     reload_active_schedules()    
     scheduler_thread = run_continuously()
     scheduler_reload_thread = start_scheduler_reload_thread()
-    app_t = Sanic.get_app()
-    app_t.ctx.scheduler_thread = scheduler_thread
-    app_t.ctx.scheduler_reload_thread = scheduler_reload_thread
+    app.ctx.scheduler_thread = scheduler_thread
+    app.ctx.scheduler_reload_thread = scheduler_reload_thread
 
 async def stop_background_scheduler(app):
     logger.info("Stopping main schedule thread...")
-    app_t = Sanic.get_app()
-    scheduler_thread = app_t.ctx.scheduler_thread
-    scheduler_reload_thread = app_t.ctx.scheduler_reload_thread
+    scheduler_thread = app.ctx.scheduler_thread
+    scheduler_reload_thread = app.ctx.scheduler_reload_thread
     unload_schedules()
     scheduler_thread.set()
     scheduler_reload_thread.set()

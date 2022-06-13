@@ -1,7 +1,6 @@
-import uu
 from sanic import Sanic, Blueprint
 from sanic.request import Request
-from sanic.response import HTTPResponse, text, json
+from sanic.response import HTTPResponse, json
 from middleware.Auth import protected
 from models.Schedule import Schedule
 from utils.RequestValidator import RequestValidator
