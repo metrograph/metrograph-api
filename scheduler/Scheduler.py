@@ -148,7 +148,7 @@ def get_inactive_schedules():
     schedules = []
     for uuid in Connection.get_connection().scan_iter('schedule:*'):
         sc = Connection.get_connection().json().get(f'{uuid.decode()}')
-        if not sc["enabled"] or sc["num_executions"] >= sc["times"]:
+        if not sc["enabled"] or (sc["num_executions"] >= sc["times"] and sc["times"] >0):
             schedules.append(sc)
     return schedules
 

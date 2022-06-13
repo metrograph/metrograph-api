@@ -35,7 +35,10 @@ async def create_schedule(request: Request) -> HTTPResponse:
         seconds = request.json.get('seconds')
         at = request.json.get('at')
         times = request.json.get('times')
-        enabled = request.json.get('enabled')
+
+        enabled = True
+        if(request.json.get('enabled')):
+            enabled = request.json.get('enabled')
 
         if Action.exists(action_uuid):
 
