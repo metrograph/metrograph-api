@@ -7,7 +7,7 @@ from scheduler.Scheduler import start_background_scheduler, stop_background_sche
 class Server:
 
     def __init__(self) -> None:
-        self.app = Sanic("metrograph-server", env_prefix='METROGRAPH_')
+        self.app = Sanic.get_app()
         
     def setup_cors(self) -> None:
         self.app.register_listener(setup_options, "before_server_start")
@@ -15,6 +15,9 @@ class Server:
 
     def setup_db(self) -> None:
         self.app.config.connection = Connection.get_connection()
+
+    def setup_encryption(self) -> None:
+        self.app.config.SECRET = self.app.config.ENCRYPTION_KEY
 
     def setup_scheduler(self) -> None:
         self.app.register_listener(start_background_scheduler, "main_process_start")

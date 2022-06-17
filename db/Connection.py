@@ -1,12 +1,13 @@
+from sanic import Sanic
 import redis
 
 class Connection:
 
-    connection =    connection = redis.Redis(
-                        host='redis-18213.c293.eu-central-1-1.ec2.cloud.redislabs.com',
-                        port=18213,
-                        db=0,
-                        password='5cpLGOIzKs6QhIy3D3C4ubUXCmQrkePe'
+    connection =    redis.Redis(
+                        host=       Sanic.get_app().config.DB_HOSTNAME,
+                        port=       Sanic.get_app().config.DB_PORT,
+                        db=         Sanic.get_app().config.DB_DBN,
+                        password=   Sanic.get_app().config.DB_PASSWORD
                     )
 
     def __init__(self) -> None:

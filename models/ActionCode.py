@@ -1,3 +1,4 @@
+from sanic import Sanic
 from distutils.dir_util import copy_tree
 from pathlib import Path
 from models.Files import Folder
@@ -9,8 +10,8 @@ from shutil import rmtree
 
 class ActionCode:
 
-    TEMPLATES_PATH = '/home/metrograph/templates'
-    ACTIONS_PATH = '/home/metrograph/actions'
+    TEMPLATES_PATH = Sanic.get_app().config.HOME+'/templates'
+    ACTIONS_PATH = Sanic.get_app().config.HOME+'/actions'
 
 
     def __init__(self):
