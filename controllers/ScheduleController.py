@@ -28,13 +28,13 @@ async def create_schedule(request: Request) -> HTTPResponse:
     if RequestValidator().validate(request=request, required_input=['action_uuid'], required_files=[]):
         
         action_uuid = request.json.get('action_uuid')
-        weeks = request.json.get('weeks')
-        days = request.json.get('days')
-        hours = request.json.get('hours')
-        minutes = request.json.get('minutes')
-        seconds = request.json.get('seconds')
+        weeks = int(request.json.get('weeks')) if request.json.get('weeks') else None
+        days = int(request.json.get('days')) if request.json.get('days') else None
+        hours = int(request.json.get('hours')) if request.json.get('hours') else None
+        minutes = int(request.json.get('minutes')) if request.json.get('minutes') else None
+        seconds = int(request.json.get('seconds')) if request.json.get('seconds') else None
         at = request.json.get('at')
-        times = request.json.get('times')
+        times = int(request.json.get('times')) if request.json.get('times') else None
 
         enabled = True
         if(request.json.get('enabled')):
