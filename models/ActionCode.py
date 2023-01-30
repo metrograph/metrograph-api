@@ -10,8 +10,7 @@ from shutil import rmtree
 
 class ActionCode:
 
-    #TEMPLATES_PATH = Sanic.get_app().config.HOME+'/templates'
-    TEMPLATES_PATH = '/home/metrograph/templates'
+    TEMPLATES_PATH = f"{Sanic.get_app().config.HOME}/templates"
     ACTIONS_PATH = Sanic.get_app().config.HOME+'/actions'
 
 
