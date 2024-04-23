@@ -11,6 +11,7 @@
 <img src="https://img.shields.io/badge/tests-%E2%9C%94%2020%20%7C%20%E2%9C%98%201%20%7C%20%E2%9E%9F%201-red" />
  </p>
 
+_Note: This project is under active development and is not meant to be used for production._
 
 **Cloud Native Serverless Plateform**
 
@@ -32,6 +33,6 @@ Follow the guided installation steps, and once done, visit http://localhost:9090
 ## Documentation
 For more setup customization (changing ports, cloud deployment, production best practices, ...), please check our documentation [here](https://metrograph.io/docs).
 
-## License
+## License 
 
 See the [LICENSE](https://github.com/metrograph) file for licensing information, and our [FAQ](https://github.com/metrograph) for any questions you may have on that topic.
